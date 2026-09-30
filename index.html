@@ -1,0 +1,1638 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Budget">
+<meta name="theme-color" content="#2d6a4f">
+<meta name="format-detection" content="telephone=no">
+<title>Budget Familial</title>
+<link rel="manifest" href="manifest.json">
+<link rel="icon" type="image/svg+xml" href="icons/icon.svg">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+<style>
+/* ── TOKENS ─────────────────────────────────────────── */
+:root {
+  --bg:        #f5f7f5;
+  --surface:   #ffffff;
+  --surface2:  #eef3ee;
+  --border:    #d9e4d9;
+  --fg:        #1a2e1a;
+  --fg2:       #4a634a;
+  --fg3:       #6f8f6f;
+  --accent:    #2d6a4f;
+  --accent-l:  #e8f4ee;
+  --on-accent: #ffffff;
+  --topbar:    #2d6a4f;
+  --green:     #1a7a45;
+  --green-l:   #e6f5ec;
+  --orange:    #c07000;
+  --orange-l:  #fff4e0;
+  --red:       #c0392b;
+  --red-l:     #fdecea;
+  --shadow:    0 4px 20px rgba(0,0,0,.18);
+  --radius:    14px;
+  --radius-s:  8px;
+  --font:      'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  color-scheme: light;
+
+  --safe-top:    env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-left:   env(safe-area-inset-left, 0px);
+  --safe-right:  env(safe-area-inset-right, 0px);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg:        #111a11;
+    --surface:   #1c2b1c;
+    --surface2:  #243424;
+    --border:    #2e442e;
+    --fg:        #e0eee0;
+    --fg2:       #9dbf9d;
+    --fg3:       #7a9f7a;
+    --accent:    #4caf80;
+    --accent-l:  #1a2e22;
+    --on-accent: #0c1f14;
+    --topbar:    #1f4d38;
+    --green:     #4caf80;
+    --green-l:   #142a1e;
+    --orange:    #ffb830;
+    --orange-l:  #2a1f00;
+    --red:       #e05a4e;
+    --red-l:     #2a0e0c;
+    --shadow:    0 4px 20px rgba(0,0,0,.5);
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg:        #111a11;
+  --surface:   #1c2b1c;
+  --surface2:  #243424;
+  --border:    #2e442e;
+  --fg:        #e0eee0;
+  --fg2:       #9dbf9d;
+  --fg3:       #7a9f7a;
+  --accent:    #4caf80;
+  --accent-l:  #1a2e22;
+  --on-accent: #0c1f14;
+  --topbar:    #1f4d38;
+  --green:     #4caf80;
+  --green-l:   #142a1e;
+  --orange:    #ffb830;
+  --orange-l:  #2a1f00;
+  --red:       #e05a4e;
+  --red-l:     #2a0e0c;
+  --shadow:    0 4px 20px rgba(0,0,0,.5);
+  color-scheme: dark;
+}
+
+/* ── RESET ──────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+html, body { height: 100%; background: var(--bg); color: var(--fg); font-family: var(--font); font-size: 15px; }
+body { overflow: hidden; overscroll-behavior: none; -webkit-text-size-adjust: 100%; }
+button { font-family: var(--font); border: none; cursor: pointer; background: none; color: inherit; font-size: inherit; }
+input, select { font-family: var(--font); }
+[hidden] { display: none !important; }
+
+/* ── SHELL ──────────────────────────────────────────── */
+#app {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  height: 100dvh;
+  max-width: 480px;
+  margin: 0 auto;
+  background: var(--bg);
+  padding-left: var(--safe-left);
+  padding-right: var(--safe-right);
+}
+
+/* ── HEADER ─────────────────────────────────────────── */
+.top-bar {
+  flex-shrink: 0;
+  background: var(--topbar);
+  color: #fff;
+  padding: calc(10px + var(--safe-top)) 16px 8px;
+}
+.top-row { display: flex; align-items: center; gap: 10px; }
+.top-bar h1 { font-size: 17px; font-weight: 700; flex: 1; letter-spacing: -0.2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.month-pill {
+  background: rgba(255,255,255,0.2);
+  border-radius: 20px;
+  padding: 5px 11px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #fff;
+  white-space: nowrap;
+}
+.theme-btn {
+  background: rgba(255,255,255,0.15);
+  border-radius: 50%;
+  width: 32px; height: 32px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 17px;
+  flex-shrink: 0;
+}
+.sync-line {
+  display: flex; align-items: center; gap: 6px;
+  margin-top: 6px;
+  font-size: 11.5px; font-weight: 500;
+  color: rgba(255,255,255,.85);
+  min-height: 16px;
+  width: 100%;
+  text-align: left;
+}
+.sync-dot { width: 7px; height: 7px; border-radius: 50%; background: #8ee6b4; flex-shrink: 0; }
+.sync-line.syncing .sync-dot { background: #fff; animation: pulse 1s ease-in-out infinite; }
+.sync-line.offline .sync-dot { background: #ffb830; }
+.sync-line.error .sync-dot   { background: #ff8a80; }
+.sync-line span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+@keyframes pulse { 50% { opacity: .25; } }
+
+/* ── SUMMARY CARDS ──────────────────────────────────── */
+.summary {
+  flex-shrink: 0;
+  padding: 12px 16px;
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 10px;
+}
+.sum-card {
+  background: var(--surface);
+  border-radius: var(--radius);
+  padding: 11px 6px;
+  text-align: center;
+  border: 1px solid var(--border);
+  min-width: 0;
+}
+.sum-card .label { font-size: 10px; font-weight: 600; color: var(--fg3); text-transform: uppercase; letter-spacing: .5px; margin-bottom: 4px; }
+.sum-card .value { font-size: 17px; font-weight: 700; font-variant-numeric: tabular-nums; line-height: 1.1; white-space: nowrap; }
+.sum-card.restant .value { color: var(--green); }
+.sum-card.restant.warn { border-color: var(--orange); background: var(--orange-l); }
+.sum-card.restant.warn .value { color: var(--orange); }
+.sum-card.restant.danger { border-color: var(--red); background: var(--red-l); }
+.sum-card.restant.danger .value { color: var(--red); }
+
+/* ── TABS ───────────────────────────────────────────── */
+.tabs {
+  flex-shrink: 0;
+  display: flex;
+  padding: 0 16px 8px;
+  gap: 6px;
+  background: var(--bg);
+}
+.tab-btn {
+  flex: 1;
+  min-width: 0;
+  background: var(--surface2);
+  border-radius: var(--radius-s);
+  padding: 6px 2px 7px;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--fg2);
+  transition: all .15s;
+  border: 1.5px solid transparent;
+  display: flex; flex-direction: column; align-items: center; gap: 1px;
+  white-space: nowrap;
+}
+.tab-btn .ti { font-size: 16px; line-height: 1.2; }
+.tab-btn.active {
+  background: var(--accent-l);
+  color: var(--accent);
+  border-color: var(--accent);
+}
+
+/* ── SCROLLABLE CONTENT ─────────────────────────────── */
+.content {
+  flex: 1;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+  padding: 0 0 calc(96px + var(--safe-bottom));
+}
+.panel { display: none; }
+.panel.active { display: block; }
+
+/* ── FORMULAIRES ────────────────────────────────────── */
+.form-section {
+  margin: 8px 16px 16px;
+  background: var(--surface);
+  border-radius: var(--radius);
+  padding: 16px;
+  border: 1px solid var(--border);
+}
+.form-section h2, .section-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--fg2);
+  text-transform: uppercase;
+  letter-spacing: .4px;
+  margin-bottom: 14px;
+}
+.field { margin-bottom: 12px; }
+.field > label, .field-label { display: block; font-size: 12px; font-weight: 600; color: var(--fg2); margin-bottom: 5px; }
+.field input, .field select {
+  width: 100%;
+  background: var(--surface2);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-s);
+  padding: 11px 13px;
+  font-size: 16px; /* 16px : évite le zoom automatique d'iOS */
+  color: var(--fg);
+  transition: border-color .15s;
+  -webkit-appearance: none;
+  appearance: none;
+  min-height: 46px;
+}
+.field select { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%236a8f6a' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 13px center; padding-right: 36px; }
+.field input:focus, .field select:focus { outline: none; border-color: var(--accent); }
+.field input.amount { font-variant-numeric: tabular-nums; font-weight: 600; }
+.field input[type="date"] { display: block; }
+.row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.btn-add, .btn-primary {
+  width: 100%;
+  background: var(--accent);
+  color: var(--on-accent);
+  border-radius: var(--radius-s);
+  padding: 14px;
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: -.2px;
+  margin-top: 4px;
+  transition: opacity .15s;
+}
+.btn-add:active, .btn-primary:active { opacity: .8; }
+.btn-add:disabled, .btn-primary:disabled { opacity: .5; }
+.btn-secondary {
+  width: 100%;
+  background: var(--surface2);
+  color: var(--fg2);
+  border-radius: var(--radius-s);
+  padding: 13px;
+  font-size: 15px;
+  font-weight: 600;
+  margin-top: 8px;
+}
+.btn-danger {
+  width: 100%;
+  background: var(--red-l);
+  color: var(--red);
+  border-radius: var(--radius-s);
+  padding: 13px;
+  font-size: 15px;
+  font-weight: 600;
+  margin-top: 8px;
+  border: 1.5px solid transparent;
+}
+.btn-danger.armed { background: var(--red); color: #fff; }
+.form-error { color: var(--red); font-size: 13px; font-weight: 600; margin: 4px 0 8px; min-height: 0; }
+.form-note { color: var(--fg3); font-size: 12.5px; line-height: 1.45; margin: 2px 0 10px; }
+
+/* Choix segmenté (Paul / Laurie, thème) */
+.seg { display: flex; gap: 6px; background: var(--surface2); border-radius: var(--radius-s); padding: 4px; }
+.seg button {
+  flex: 1; padding: 9px 6px; border-radius: 6px;
+  font-size: 14px; font-weight: 600; color: var(--fg2);
+  border: 1.5px solid transparent;
+}
+.seg button.active { background: var(--surface); color: var(--accent); border-color: var(--accent); }
+
+/* ── CATÉGORIES (onglet Budget) ─────────────────────── */
+.cat-section { margin: 0 16px 12px; }
+.cat-group-title {
+  display: flex; justify-content: space-between; align-items: baseline; gap: 8px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .8px;
+  color: var(--fg3);
+  padding: 14px 2px 6px;
+}
+.cat-group-title .gt { font-variant-numeric: tabular-nums; letter-spacing: 0; text-transform: none; font-weight: 600; white-space: nowrap; }
+.cat-card {
+  width: 100%;
+  text-align: left;
+  background: var(--surface);
+  border-radius: var(--radius);
+  padding: 13px 14px 13px 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  border: 1px solid var(--border);
+  margin-bottom: 7px;
+  transition: transform .1s;
+  position: relative;
+  overflow: hidden;
+  color: var(--fg);
+}
+.cat-card:active { transform: scale(.985); }
+.cat-card::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 4px;
+  border-radius: 4px 0 0 4px;
+  background: var(--accent);
+}
+.cat-card.ok::before { background: var(--green); }
+.cat-card.warn::before { background: var(--orange); }
+.cat-card.over::before { background: var(--red); }
+.cat-info { flex: 1; min-width: 0; }
+.cat-name { font-size: 14px; font-weight: 600; color: var(--fg); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.cat-sub { font-size: 12px; color: var(--fg3); margin-top: 1px; font-variant-numeric: tabular-nums; }
+.cat-right { text-align: right; flex-shrink: 0; }
+.cat-restant { font-size: 16px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.cat-restant-l { font-size: 10px; font-weight: 600; color: var(--fg3); text-transform: uppercase; letter-spacing: .4px; }
+.cat-restant.ok { color: var(--green); }
+.cat-restant.warn { color: var(--orange); }
+.cat-restant.over { color: var(--red); }
+.cat-bar {
+  height: 4px;
+  border-radius: 2px;
+  background: var(--surface2);
+  margin-top: 8px;
+  overflow: hidden;
+}
+.cat-bar-fill {
+  height: 100%;
+  border-radius: 2px;
+  background: var(--green);
+  transition: width .3s ease;
+}
+.cat-bar-fill.warn { background: var(--orange); }
+.cat-bar-fill.over { background: var(--red); }
+
+/* ── JOURNAL ────────────────────────────────────────── */
+.journal-section { margin: 4px 16px 0; }
+.journal-head { display: flex; justify-content: space-between; font-size: 12px; font-weight: 600; color: var(--fg3); padding: 6px 2px 8px; font-variant-numeric: tabular-nums; }
+.jour-entry {
+  background: var(--surface);
+  border-radius: var(--radius-s);
+  padding: 12px 12px 12px 14px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  border: 1px solid var(--border);
+  margin-bottom: 7px;
+  min-height: 62px;
+}
+.jour-entry .date-badge {
+  background: var(--surface2);
+  border-radius: 6px;
+  padding: 4px 8px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--fg2);
+  white-space: nowrap;
+  flex-shrink: 0;
+  font-variant-numeric: tabular-nums;
+}
+.jour-entry .info { flex: 1; min-width: 0; }
+.jour-entry .cat { font-size: 13px; font-weight: 600; color: var(--fg); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.jour-entry .libelle { font-size: 12px; color: var(--fg3); margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.who { display: inline-block; font-size: 10.5px; font-weight: 700; padding: 1px 6px; border-radius: 10px; background: var(--accent-l); color: var(--accent); margin-right: 4px; vertical-align: 1px; }
+.who.laurie { background: var(--orange-l); color: var(--orange); }
+.pending-tag { font-size: 11px; color: var(--orange); font-weight: 600; }
+.jour-entry .amount { font-size: 15px; font-weight: 700; color: var(--red); font-variant-numeric: tabular-nums; flex-shrink: 0; }
+.jour-entry .del-btn {
+  background: var(--red-l);
+  color: var(--red);
+  border-radius: 50%;
+  width: 30px; height: 30px;
+  font-size: 13px;
+  flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+}
+.jour-entry.confirm { background: var(--red-l); border-color: var(--red); }
+.jour-entry.confirm .q { flex: 1; font-size: 13.5px; font-weight: 600; color: var(--fg); min-width: 0; }
+.jour-entry.confirm .q small { display: block; font-weight: 500; color: var(--fg2); font-size: 12px; margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.mini-btn { padding: 8px 11px; border-radius: 6px; font-size: 13px; font-weight: 700; flex-shrink: 0; }
+.mini-btn.cancel { background: var(--surface); color: var(--fg2); border: 1px solid var(--border); }
+.mini-btn.del { background: var(--red); color: #fff; }
+.empty-state {
+  text-align: center;
+  padding: 40px 20px;
+  color: var(--fg3);
+}
+.empty-state .ico { font-size: 40px; margin-bottom: 12px; }
+.empty-state p { font-size: 14px; line-height: 1.5; }
+
+/* ── PARAMÈTRES ─────────────────────────────────────── */
+.settings { margin: 4px 16px 0; }
+.settings .section-title { margin: 18px 2px 8px; font-size: 12px; color: var(--fg3); letter-spacing: .8px; }
+.settings .section-title:first-child { margin-top: 8px; }
+.set-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  margin-bottom: 10px;
+  position: relative;
+}
+.set-card.bordered::before {
+  content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 4px; background: var(--accent);
+}
+.set-head {
+  display: flex; align-items: center; gap: 8px;
+  padding: 12px 12px 10px 16px;
+  border-bottom: 1px solid var(--border);
+}
+.set-head .t { flex: 1; font-weight: 700; font-size: 14px; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.set-head .s { font-size: 12px; color: var(--fg3); font-weight: 600; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.icon-btn { background: var(--surface2); color: var(--fg2); border-radius: 6px; padding: 6px 9px; font-size: 12px; font-weight: 600; white-space: nowrap; }
+.set-row {
+  display: flex; align-items: center; gap: 10px;
+  width: 100%; text-align: left;
+  padding: 12px 14px 12px 16px;
+  border-bottom: 1px solid var(--border);
+  font-size: 14px; color: var(--fg);
+  min-height: 46px;
+}
+.set-row:last-child { border-bottom: none; }
+.set-row:active { background: var(--surface2); }
+.set-row .n { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 500; }
+.set-row .v { font-variant-numeric: tabular-nums; color: var(--fg2); font-weight: 600; white-space: nowrap; }
+.set-row .chev { color: var(--fg3); font-size: 16px; }
+.set-row.add { color: var(--accent); font-weight: 600; }
+.set-row.static:active { background: none; }
+.set-body { padding: 12px 16px; }
+.set-body .field-label { margin-top: 2px; }
+.set-body .seg { margin-bottom: 12px; }
+.set-total { display: flex; justify-content: space-between; padding: 10px 16px; font-size: 13px; font-weight: 700; color: var(--fg2); background: var(--surface2); font-variant-numeric: tabular-nums; }
+.recap { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; text-align: center; padding: 12px; }
+.recap .label { font-size: 10px; font-weight: 600; color: var(--fg3); text-transform: uppercase; letter-spacing: .5px; }
+.recap .value { font-size: 15px; font-weight: 700; font-variant-numeric: tabular-nums; margin-top: 2px; white-space: nowrap; }
+.btn-outline {
+  width: 100%; padding: 12px; border-radius: var(--radius); border: 1.5px dashed var(--border);
+  color: var(--accent); font-weight: 600; font-size: 14px; background: transparent; margin-bottom: 10px;
+}
+.about { text-align: center; font-size: 11.5px; color: var(--fg3); padding: 14px 0 4px; line-height: 1.5; }
+
+/* ── BOUTON FLOTTANT ────────────────────────────────── */
+.fab {
+  position: fixed;
+  bottom: calc(20px + var(--safe-bottom));
+  right: max(20px, calc(50% - 240px + 20px));
+  background: var(--accent);
+  color: var(--on-accent);
+  border-radius: 50%;
+  width: 56px; height: 56px;
+  font-size: 30px;
+  font-weight: 400;
+  box-shadow: var(--shadow);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 200;
+  transition: transform .15s, opacity .15s;
+}
+.fab:active { transform: scale(.92); }
+
+/* ── FEUILLES MODALES ───────────────────────────────── */
+.modal-bg {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.45);
+  z-index: 300;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  animation: fade .15s ease;
+}
+.modal-sheet {
+  background: var(--surface);
+  border-radius: var(--radius) var(--radius) 0 0;
+  width: 100%;
+  max-width: 480px;
+  padding: 8px 16px calc(20px + var(--safe-bottom));
+  max-height: 88vh;
+  max-height: 88dvh;
+  overflow-y: auto;
+  animation: up .2s ease;
+}
+@keyframes fade { from { opacity: 0; } }
+@keyframes up { from { transform: translateY(40px); opacity: .6; } }
+.sheet-handle {
+  width: 36px; height: 4px;
+  background: var(--border);
+  border-radius: 2px;
+  margin: 0 auto 16px;
+}
+.sheet-title { font-size: 16px; font-weight: 700; margin-bottom: 14px; }
+.year-nav { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+.year-nav b { font-size: 16px; font-variant-numeric: tabular-nums; }
+.year-nav button { background: var(--surface2); width: 38px; height: 38px; border-radius: 50%; font-size: 18px; color: var(--fg2); }
+.month-list { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
+.month-opt {
+  background: var(--surface2);
+  border-radius: var(--radius-s);
+  padding: 12px 4px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--fg2);
+  border: 1.5px solid transparent;
+  text-align: center;
+  transition: all .15s;
+}
+.month-opt.now { border-color: var(--border); }
+.month-opt.active {
+  background: var(--accent-l);
+  color: var(--accent);
+  border-color: var(--accent);
+}
+
+/* ── ACCUEIL (1er lancement) ────────────────────────── */
+.welcome {
+  position: fixed; inset: 0; z-index: 400;
+  background: var(--bg);
+  overflow-y: auto;
+  padding: calc(28px + var(--safe-top)) 20px calc(24px + var(--safe-bottom));
+}
+.welcome-inner { max-width: 420px; margin: 0 auto; }
+.welcome .logo { width: 76px; height: 76px; border-radius: 20px; display: block; margin: 8px auto 14px; box-shadow: var(--shadow); }
+.welcome h2 { text-align: center; font-size: 22px; font-weight: 700; letter-spacing: -.3px; }
+.welcome .lead { text-align: center; color: var(--fg2); font-size: 14px; line-height: 1.5; margin: 6px 0 20px; }
+.welcome .skip { display: block; margin: 14px auto 0; color: var(--fg3); font-size: 13px; text-decoration: underline; }
+
+/* ── TOAST ──────────────────────────────────────────── */
+.toast {
+  position: fixed;
+  bottom: calc(88px + var(--safe-bottom));
+  left: 50%;
+  transform: translateX(-50%) translateY(20px);
+  background: var(--fg);
+  color: var(--bg);
+  padding: 10px 18px;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: 600;
+  opacity: 0;
+  transition: all .25s;
+  z-index: 500;
+  max-width: calc(100% - 32px);
+  text-align: center;
+  pointer-events: none;
+  box-shadow: var(--shadow);
+}
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+</style>
+</head>
+<body>
+<div id="app">
+  <!-- Barre du haut -->
+  <header class="top-bar">
+    <div class="top-row">
+      <h1>🌿 Budget Familial</h1>
+      <button class="month-pill" id="monthBtn" aria-label="Changer de mois"></button>
+      <button class="theme-btn" id="themeBtn" aria-label="Changer de thème">☀️</button>
+    </div>
+    <button class="sync-line" id="syncLine" aria-label="Synchroniser maintenant">
+      <i class="sync-dot"></i><span id="syncText">…</span>
+    </button>
+  </header>
+
+  <!-- Résumé -->
+  <div class="summary">
+    <div class="sum-card">
+      <div class="label">Revenus</div>
+      <div class="value" id="sumRev">—</div>
+    </div>
+    <div class="sum-card">
+      <div class="label">Dépensé</div>
+      <div class="value" id="sumDep">—</div>
+    </div>
+    <div class="sum-card restant" id="sumRestantCard">
+      <div class="label">Restant</div>
+      <div class="value" id="sumRestant">—</div>
+    </div>
+  </div>
+
+  <!-- Onglets -->
+  <nav class="tabs" role="tablist">
+    <button class="tab-btn active" data-tab="budget" role="tab"><span class="ti">📊</span>Budget</button>
+    <button class="tab-btn" data-tab="saisie" role="tab"><span class="ti">➕</span>Saisir</button>
+    <button class="tab-btn" data-tab="journal" role="tab"><span class="ti">📋</span>Journal</button>
+    <button class="tab-btn" data-tab="params" role="tab"><span class="ti">⚙️</span>Paramètres</button>
+  </nav>
+
+  <main class="content" id="content">
+    <!-- Onglet Budget -->
+    <section class="panel active" id="tab-budget">
+      <div class="cat-section" id="catList"></div>
+    </section>
+
+    <!-- Onglet Saisir -->
+    <section class="panel" id="tab-saisie">
+      <form class="form-section" id="opForm" autocomplete="off" novalidate>
+        <h2>Nouvelle dépense</h2>
+        <div class="field">
+          <span class="field-label">Qui saisit ?</span>
+          <div class="seg" id="fWho">
+            <button type="button" data-who="Paul">Paul</button>
+            <button type="button" data-who="Laurie">Laurie</button>
+          </div>
+        </div>
+        <div class="field">
+          <label for="fCat">Catégorie</label>
+          <select id="fCat"></select>
+        </div>
+        <div class="field">
+          <label for="fLib">Libellé (optionnel)</label>
+          <input type="text" id="fLib" placeholder="ex : Carrefour, pharmacie…" maxlength="100" enterkeyhint="next">
+        </div>
+        <div class="row-2">
+          <div class="field">
+            <label for="fMont">Montant (€)</label>
+            <input type="text" id="fMont" class="amount" inputmode="decimal" placeholder="0,00" enterkeyhint="done">
+          </div>
+          <div class="field">
+            <label for="fDate">Date</label>
+            <input type="date" id="fDate">
+          </div>
+        </div>
+        <div class="form-error" id="fErr"></div>
+        <button class="btn-add" id="btnAdd" type="submit">Ajouter la dépense</button>
+      </form>
+    </section>
+
+    <!-- Onglet Journal -->
+    <section class="panel" id="tab-journal">
+      <div class="journal-section" id="journalList"></div>
+    </section>
+
+    <!-- Onglet Paramètres -->
+    <section class="panel" id="tab-params">
+      <div class="settings" id="settings"></div>
+    </section>
+  </main>
+</div>
+
+<!-- Bouton flottant -->
+<button class="fab" id="fab" aria-label="Saisir une dépense">+</button>
+
+<!-- Choix du mois -->
+<div class="modal-bg" id="monthModal" hidden>
+  <div class="modal-sheet" role="dialog" aria-label="Choisir un mois">
+    <div class="sheet-handle"></div>
+    <div class="sheet-title">Choisir un mois</div>
+    <div class="year-nav">
+      <button id="yearPrev" aria-label="Année précédente">‹</button>
+      <b id="yearLabel"></b>
+      <button id="yearNext" aria-label="Année suivante">›</button>
+    </div>
+    <div class="month-list" id="monthList"></div>
+    <button class="btn-secondary" id="monthNow">Revenir au mois en cours</button>
+  </div>
+</div>
+
+<!-- Feuille d'édition (paramètres) -->
+<div class="modal-bg" id="editModal" hidden>
+  <form class="modal-sheet" id="editForm" role="dialog" autocomplete="off" novalidate>
+    <div class="sheet-handle"></div>
+    <div class="sheet-title" id="editTitle"></div>
+    <div id="editFields"></div>
+    <div class="form-error" id="editErr"></div>
+    <button class="btn-primary" type="submit" id="editSave">Enregistrer</button>
+    <button class="btn-danger" type="button" id="editDelete" hidden>Supprimer</button>
+    <button class="btn-secondary" type="button" id="editCancel">Annuler</button>
+  </form>
+</div>
+
+<!-- Accueil / code famille -->
+<div class="welcome" id="welcome" hidden>
+  <form class="welcome-inner" id="welcomeForm" autocomplete="off" novalidate>
+    <img class="logo" src="icons/icon-192.png" alt="">
+    <h2>Bienvenue 👋</h2>
+    <p class="lead" id="welcomeLead">Le budget de la famille, partagé entre vos deux téléphones.</p>
+    <div class="form-section" style="margin:0">
+      <div class="field">
+        <span class="field-label">Qui utilise ce téléphone ?</span>
+        <div class="seg" id="wWho">
+          <button type="button" data-who="Paul">Paul</button>
+          <button type="button" data-who="Laurie">Laurie</button>
+        </div>
+      </div>
+      <div class="field" id="wCodeField">
+        <label for="wCode">Code famille</label>
+        <input type="text" id="wCode" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="Le code choisi par Paul" enterkeyhint="go">
+      </div>
+      <div class="form-error" id="wErr"></div>
+      <button class="btn-primary" type="submit" id="wGo">Commencer</button>
+    </div>
+    <button class="skip" type="button" id="wSkip" hidden>Continuer sans synchronisation</button>
+  </form>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script src="data.js"></script>
+<script src="script-url.js"></script>
+<!-- config.js : facultatif, uniquement pour les tests sur ordinateur (non publié) -->
+<script src="config.js" onerror="void 0"></script>
+<script>
+'use strict';
+
+// ═══════════════════════════════════════════════════════════
+//  CONFIGURATION
+// ═══════════════════════════════════════════════════════════
+const LOCAL = window.BUDGET_CONFIG || {};
+const SCRIPT_URL = String(LOCAL.SCRIPT_URL || window.BUDGET_SCRIPT_URL || '').trim();
+const CODE_FIXE = String(LOCAL.ACCESS_CODE || '').trim();
+const AUTEURS = ['Paul', 'Laurie'];
+const RAFRAICHISSEMENT_MS = 30000;
+const MOIS = ['Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre'];
+const MOIS_COURTS = ['Janv.','Févr.','Mars','Avril','Mai','Juin','Juil.','Août','Sept.','Oct.','Nov.','Déc.'];
+const HORS_BUDGET = '❓ Hors budget';
+
+// ═══════════════════════════════════════════════════════════
+//  STOCKAGE LOCAL (préfixe bf_)
+// ═══════════════════════════════════════════════════════════
+function lsGet(k, def) {
+  try { const v = localStorage.getItem('bf_' + k); return v == null ? def : JSON.parse(v); }
+  catch { return def; }
+}
+function lsSet(k, v) {
+  try { localStorage.setItem('bf_' + k, JSON.stringify(v)); } catch {}
+}
+function lsKeys(prefix) {
+  const out = [];
+  try { for (let i = 0; i < localStorage.length; i++) { const k = localStorage.key(i); if (k.startsWith('bf_' + prefix)) out.push(k.slice(3)); } } catch {}
+  return out;
+}
+
+// ═══════════════════════════════════════════════════════════
+//  OUTILS
+// ═══════════════════════════════════════════════════════════
+const $ = id => document.getElementById(id);
+const pad = n => String(n).padStart(2, '0');
+const monthKey = d => d.getFullYear() + '-' + pad(d.getMonth() + 1);
+const dateKey = d => monthKey(d) + '-' + pad(d.getDate());
+const clone = o => JSON.parse(JSON.stringify(o));
+function monthLabel(m) { const [y, mm] = m.split('-'); return MOIS[+mm - 1] + ' ' + y; }
+function monthShort(m) { const [y, mm] = m.split('-'); return MOIS_COURTS[+mm - 1] + ' ' + y; }
+function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2, 8); }
+function esc(s) {
+  return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+}
+const nf2 = new Intl.NumberFormat('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+const nf0 = new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 0 });
+const r2 = n => Math.round(n * 100) / 100;
+// 1 234,56 €
+function fmt(n) { n = r2(n); return (n < 0 ? '−' : '') + nf2.format(Math.abs(n)) + ' €'; }
+// 1 235 € (tuiles de résumé)
+function fmt0(n) { n = Math.round(n); return (n < 0 ? '−' : '') + nf0.format(Math.abs(n)) + ' €'; }
+// Montant saisi (« 12,50 », « 1 200 ») → nombre, ou NaN
+function parseAmount(s) {
+  s = String(s || '').replace(/[\s  €]/g, '').replace(',', '.');
+  if (!/^\d+(\.\d{0,2})?$|^\.\d{1,2}$/.test(s)) return NaN;
+  return r2(parseFloat(s));
+}
+function amountInput(n) { return n ? String(r2(n)).replace('.', ',') : ''; }
+function hhmm(ts) { const d = new Date(ts); return pad(d.getHours()) + ':' + pad(d.getMinutes()); }
+const plural = (n, s, p) => n + ' ' + (n > 1 ? p : s);
+const sameName = (a, b) => a.trim().toLowerCase() === b.trim().toLowerCase();
+
+// ═══════════════════════════════════════════════════════════
+//  ÉTAT
+// ═══════════════════════════════════════════════════════════
+const state = {
+  month: monthKey(new Date()),
+  tab: 'budget',
+  theme: lsGet('theme', 'system'),          // 'system' | 'light' | 'dark'
+  author: lsGet('author', ''),
+  code: CODE_FIXE || lsGet('code', ''),
+  localOnly: lsGet('localOnly', false),     // mode démo sans Google Sheet
+  serverConfig: lsGet('config', null),      // dernière config reçue du Sheet
+  queue: lsGet('queue', []),                // modifications en attente d'envoi
+  lastSync: lsGet('lastSync', 0),
+  sync: 'idle',
+  syncMsg: '',
+  confirmDel: null,                         // id en cours de confirmation (Journal)
+};
+const opsCache = {};                        // { 'AAAA-MM': [op, …] } (copie du Sheet)
+
+function loadOpsCache(m) {
+  if (!opsCache[m]) opsCache[m] = lsGet('ops_' + m, []);
+  return opsCache[m];
+}
+function saveOpsCache(m, ops) { opsCache[m] = ops; lsSet('ops_' + m, ops); }
+function saveQueue() { lsSet('queue', state.queue); }
+
+// ── Configuration effective (Sheet + modifications en attente) ──
+function normalizeConfig(c) {
+  c = clone(c || { revenus: [], groupes: [], depenses: [] });
+  c.revenus = c.revenus || []; c.depenses = c.depenses || []; c.groupes = c.groupes || [];
+  for (const d of c.depenses) if (!c.groupes.includes(d.groupe)) c.groupes.push(d.groupe);
+  return c;
+}
+function getConfig() {
+  for (let i = state.queue.length - 1; i >= 0; i--) {
+    if (state.queue[i].type === 'config') return normalizeConfig(state.queue[i].config);
+  }
+  return normalizeConfig(state.serverConfig || window.BUDGET_DATA);
+}
+function pendingRenames() {
+  return state.queue.filter(q => q.type === 'config').flatMap(q => q.renames || []);
+}
+function renameCat(name, renames) {
+  for (const r of renames) if (name === r.from) name = r.to;
+  return name;
+}
+
+// ── Opérations effectives d'un mois (Sheet + ajouts/suppressions en attente) ──
+function getOps(m) {
+  const renames = pendingRenames();
+  const deleted = new Set(state.queue.filter(q => q.type === 'delete').map(q => q.id));
+  const seen = new Set();
+  const list = [];
+  for (const o of loadOpsCache(m)) {
+    if (deleted.has(o.id)) continue;
+    seen.add(o.id);
+    list.push({ ...o, categorie: renameCat(o.categorie, renames) });
+  }
+  for (const q of state.queue) {
+    if (q.type !== 'add' || !q.op.date.startsWith(m) || seen.has(q.op.id) || deleted.has(q.op.id)) continue;
+    seen.add(q.op.id);
+    list.push({ ...q.op, categorie: renameCat(q.op.categorie, renames), pending: true });
+  }
+  return list.sort((a, b) => b.date.localeCompare(a.date) || String(b.id).localeCompare(String(a.id)));
+}
+
+// ═══════════════════════════════════════════════════════════
+//  MODIFICATIONS (affichage immédiat + file d'attente)
+// ═══════════════════════════════════════════════════════════
+let inFlight = null; // qid de l'élément en cours d'envoi
+
+function enqueue(item) {
+  item.qid = uid();
+  state.queue.push(item);
+  saveQueue();
+  renderAll();
+  sync();
+}
+function addOperation(op) { enqueue({ type: 'add', op }); }
+function deleteOperation(id) {
+  // Ajout pas encore envoyé : on l'annule simplement
+  const i = state.queue.findIndex(q => q.type === 'add' && q.op.id === id && q.qid !== inFlight);
+  if (i >= 0) { state.queue.splice(i, 1); saveQueue(); renderAll(); return; }
+  enqueue({ type: 'delete', id });
+}
+function saveConfig(config, renames = []) {
+  const last = state.queue[state.queue.length - 1];
+  if (last && last.type === 'config' && last.qid !== inFlight) {
+    last.config = config;
+    last.renames = (last.renames || []).concat(renames);
+    saveQueue(); renderAll(); sync();
+  } else {
+    enqueue({ type: 'config', config, renames });
+  }
+}
+
+// ═══════════════════════════════════════════════════════════
+//  API (Google Apps Script)
+// ═══════════════════════════════════════════════════════════
+class ApiError extends Error {
+  constructor(kind, message) { super(message); this.kind = kind; }
+}
+async function api(params, post) {
+  if (!SCRIPT_URL) throw new ApiError('unconfigured', "L'app n'est pas reliée au Google Sheet");
+  const ctrl = new AbortController();
+  const timer = setTimeout(() => ctrl.abort(), 25000);
+  let res;
+  try {
+    if (post) {
+      // text/plain : requête « simple », pas de preflight CORS
+      res = await fetch(SCRIPT_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify({ ...params, code: state.code }),
+        signal: ctrl.signal,
+      });
+    } else {
+      const qs = new URLSearchParams({ ...params, code: state.code, _: Date.now() });
+      res = await fetch(SCRIPT_URL + (SCRIPT_URL.includes('?') ? '&' : '?') + qs, { signal: ctrl.signal, cache: 'no-store' });
+    }
+  } catch (e) {
+    throw new ApiError(navigator.onLine === false ? 'offline' : 'unreachable', 'Serveur injoignable');
+  } finally {
+    clearTimeout(timer);
+  }
+  let data;
+  try { data = await res.json(); }
+  catch { throw new ApiError('badresponse', 'Réponse inattendue du script (vérifier le déploiement)'); }
+  if (!data || !data.ok) throw new ApiError((data && data.error) || 'server', (data && data.message) || 'Erreur du script');
+  return data;
+}
+
+// ═══════════════════════════════════════════════════════════
+//  SYNCHRONISATION
+// ═══════════════════════════════════════════════════════════
+let syncing = false, syncAgain = false;
+
+function canSync() { return !!SCRIPT_URL && !!state.code && !state.localOnly; }
+
+async function sync() {
+  if (!canSync()) { setSync(state.localOnly || !SCRIPT_URL ? 'unconfigured' : 'idle'); return; }
+  if (syncing) { syncAgain = true; return; }
+  syncing = true;
+  setSync('syncing');
+  try {
+    await flushQueue();
+    await fetchMonth(state.month);
+    state.lastSync = Date.now();
+    lsSet('lastSync', state.lastSync);
+    setSync('ok');
+  } catch (e) {
+    handleSyncError(e);
+  } finally {
+    syncing = false;
+    inFlight = null;
+    if (syncAgain) { syncAgain = false; if (state.sync === 'ok') setTimeout(sync, 50); }
+  }
+}
+
+async function flushQueue() {
+  while (state.queue.length) {
+    const item = state.queue[0];
+    inFlight = item.qid;
+    try {
+      if (item.type === 'add') {
+        await api({ action: 'addOperation', op: item.op }, true);
+        const m = item.op.date.slice(0, 7);
+        const ops = loadOpsCache(m).filter(o => o.id !== item.op.id);
+        ops.push(item.op);
+        saveOpsCache(m, ops);
+      } else if (item.type === 'delete') {
+        await api({ action: 'deleteOperation', id: item.id }, true);
+        for (const k of lsKeys('ops_')) {
+          const m = k.slice(4), ops = loadOpsCache(m);
+          if (ops.some(o => o.id === item.id)) saveOpsCache(m, ops.filter(o => o.id !== item.id));
+        }
+      } else if (item.type === 'config') {
+        const r = await api({ action: 'saveConfig', config: item.config, renames: item.renames || [] }, true);
+        applyRenamesToCache(item.renames || []);
+        setServerConfig(r.config);
+      }
+    } catch (e) {
+      if (e.kind !== 'invalid') throw e;
+      toast('⚠️ Modification refusée : ' + e.message);
+    } finally {
+      inFlight = null;
+    }
+    state.queue = state.queue.filter(q => q.qid !== item.qid);
+    saveQueue();
+    renderAll();
+  }
+}
+
+async function fetchMonth(m) {
+  const r = await api({ action: 'getAll', month: m });
+  let config = r.config;
+  if (!config) {
+    // Premier lancement : l'onglet Config est vide, on y envoie les données initiales
+    const init = await api({ action: 'init', config: getConfig() }, true);
+    config = init.config;
+  }
+  setServerConfig(config);
+  saveOpsCache(m, r.ops || []);
+  renderAll();
+}
+
+function setServerConfig(c) {
+  if (!c) return;
+  state.serverConfig = c;
+  lsSet('config', c);
+}
+function applyRenamesToCache(renames) {
+  if (!renames.length) return;
+  for (const k of lsKeys('ops_')) {
+    const m = k.slice(4);
+    saveOpsCache(m, loadOpsCache(m).map(o => ({ ...o, categorie: renameCat(o.categorie, renames) })));
+  }
+}
+
+function handleSyncError(e) {
+  const kind = e.kind || 'unreachable';
+  if (kind === 'code') {
+    if (!CODE_FIXE) { state.code = ''; lsSet('code', ''); }
+    setSync('error', 'Code famille refusé');
+    showWelcome('Le code famille a été refusé. Saisissez le code actuel.');
+  } else if (kind === 'offline') setSync('offline');
+  else if (kind === 'unreachable') setSync('offline', 'Serveur injoignable');
+  else if (kind === 'config') setSync('error', 'Code non choisi dans le script');
+  else setSync('error', e.message);
+}
+
+function setSync(s, msg = '') { state.sync = s; state.syncMsg = msg; renderSync(); }
+
+function renderSync() {
+  const n = state.queue.length;
+  const attente = n ? plural(n, 'opération en attente', 'opérations en attente') : '';
+  const last = state.lastSync ? ' · ' + hhmm(state.lastSync) : '';
+  let cls = '', txt = '';
+  switch (state.sync) {
+    case 'syncing': cls = 'syncing'; txt = 'Synchronisation…' + (n ? ' (' + attente + ')' : ''); break;
+    case 'ok':      txt = n ? attente : 'À jour' + last; break;
+    case 'offline': cls = 'offline'; txt = (state.syncMsg || 'Hors ligne') + (n ? ' – ' + attente : '') + (state.lastSync ? ' · sync ' + hhmm(state.lastSync) : ''); break;
+    case 'error':   cls = 'error'; txt = '⚠️ ' + state.syncMsg + (n ? ' – ' + attente : ''); break;
+    case 'unconfigured': cls = 'offline'; txt = 'Mode local (non relié au Google Sheet)' + (n ? ' – ' + attente : ''); break;
+    default:        txt = state.lastSync ? 'Dernière sync' + last : '…';
+  }
+  const el = $('syncLine');
+  el.className = 'sync-line ' + cls;
+  $('syncText').textContent = txt;
+  if (state.tab === 'params') renderSettingsSync();
+}
+
+// ═══════════════════════════════════════════════════════════
+//  THÈME
+// ═══════════════════════════════════════════════════════════
+const darkMq = window.matchMedia('(prefers-color-scheme: dark)');
+function applyTheme() {
+  const root = document.documentElement;
+  if (state.theme === 'system') delete root.dataset.theme;
+  else root.dataset.theme = state.theme;
+  const dark = state.theme === 'dark' || (state.theme === 'system' && darkMq.matches);
+  $('themeBtn').textContent = state.theme === 'system' ? '🌓' : dark ? '🌙' : '☀️';
+  document.querySelector('meta[name="theme-color"]').content = dark ? '#1f4d38' : '#2d6a4f';
+}
+function setTheme(t) { state.theme = t; lsSet('theme', t); applyTheme(); if (state.tab === 'params') renderSettings(); }
+darkMq.addEventListener && darkMq.addEventListener('change', applyTheme);
+
+// ═══════════════════════════════════════════════════════════
+//  ONGLETS
+// ═══════════════════════════════════════════════════════════
+function switchTab(name) {
+  state.tab = name;
+  state.confirmDel = null;
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === name));
+  document.querySelectorAll('.panel').forEach(p => p.classList.toggle('active', p.id === 'tab-' + name));
+  $('fab').hidden = name === 'saisie';
+  $('content').scrollTop = 0;
+  if (name === 'journal') renderJournal();
+  if (name === 'params') renderSettings();
+}
+
+// ═══════════════════════════════════════════════════════════
+//  CALCULS
+// ═══════════════════════════════════════════════════════════
+function status(spent, planned) {
+  if (spent > planned + 0.004) return 'over';
+  if (planned > 0 && spent / planned > 0.8) return 'warn';
+  return 'ok';
+}
+function monthStats() {
+  const cfg = getConfig();
+  const ops = getOps(state.month);
+  const byCat = {};
+  for (const o of ops) byCat[o.categorie] = r2((byCat[o.categorie] || 0) + o.montant);
+  const revenus = r2(cfg.revenus.reduce((s, r) => s + r.montant, 0));
+  const prevu = r2(cfg.depenses.reduce((s, d) => s + d.montant, 0));
+  const depense = r2(ops.reduce((s, o) => s + o.montant, 0));
+  return { cfg, ops, byCat, revenus, prevu, depense };
+}
+
+// ═══════════════════════════════════════════════════════════
+//  RENDU
+// ═══════════════════════════════════════════════════════════
+function renderAll() {
+  $('monthBtn').textContent = monthLabel(state.month);
+  const st = monthStats();
+  renderSummary(st);
+  renderBudget(st);
+  renderCatSelect(st.cfg);
+  if (state.tab === 'journal') renderJournal();
+  if (state.tab === 'params') renderSettings();
+  renderSync();
+}
+
+function renderSummary({ revenus, depense }) {
+  const restant = revenus - depense;
+  $('sumRev').textContent = fmt0(revenus);
+  $('sumDep').textContent = fmt0(depense);
+  $('sumRestant').textContent = fmt0(restant);
+  const card = $('sumRestantCard');
+  card.classList.toggle('danger', depense > revenus + 0.004);
+  card.classList.toggle('warn', depense <= revenus + 0.004 && revenus > 0 && depense / revenus > 0.8);
+}
+
+function catCard(nom, prevu, spent) {
+  const restant = prevu - spent;
+  const st = status(spent, prevu);
+  const pct = prevu > 0 ? Math.min(spent / prevu, 1) : (spent > 0 ? 1 : 0);
+  return `<button class="cat-card ${st}" data-cat="${esc(nom)}">
+      <div class="cat-info">
+        <div class="cat-name">${esc(nom)}</div>
+        <div class="cat-sub">Prévu ${fmt(prevu)} · Dépensé ${fmt(spent)}</div>
+        <div class="cat-bar"><div class="cat-bar-fill ${st}" style="width:${(pct * 100).toFixed(1)}%"></div></div>
+      </div>
+      <div class="cat-right">
+        <div class="cat-restant ${st}">${fmt(restant)}</div>
+        <div class="cat-restant-l">${restant < 0 ? 'dépassé' : 'restant'}</div>
+      </div>
+    </button>`;
+}
+
+function renderBudget({ cfg, byCat }) {
+  let html = '';
+  for (const g of cfg.groupes) {
+    const cats = cfg.depenses.filter(d => d.groupe === g);
+    if (!cats.length) continue;
+    const gp = cats.reduce((s, d) => s + d.montant, 0);
+    const gs = cats.reduce((s, d) => s + (byCat[d.nom] || 0), 0);
+    html += `<div class="cat-group-title"><span>${esc(g)}</span><span class="gt">${fmt(gs)} / ${fmt(gp)}</span></div>`;
+    html += cats.map(d => catCard(d.nom, d.montant, byCat[d.nom] || 0)).join('');
+  }
+  // Dépenses dont la catégorie n'existe plus
+  const known = new Set(cfg.depenses.map(d => d.nom));
+  const orphans = Object.keys(byCat).filter(c => !known.has(c));
+  if (orphans.length) {
+    html += `<div class="cat-group-title"><span>${HORS_BUDGET}</span></div>`;
+    html += orphans.map(c => catCard(c, 0, byCat[c])).join('');
+  }
+  if (!cfg.depenses.length && !orphans.length) {
+    html = `<div class="empty-state"><div class="ico">🗂️</div><p>Aucune catégorie.<br>Ajoutez-en dans l'onglet <b>Paramètres</b>.</p></div>`;
+  }
+  $('catList').innerHTML = html;
+}
+
+function renderCatSelect(cfg) {
+  const sel = $('fCat');
+  const current = sel.value;
+  let html = '';
+  for (const g of cfg.groupes) {
+    const cats = cfg.depenses.filter(d => d.groupe === g);
+    if (!cats.length) continue;
+    html += `<optgroup label="${esc(g)}">` + cats.map(d => `<option value="${esc(d.nom)}">${esc(d.nom)}</option>`).join('') + '</optgroup>';
+  }
+  if (sel.dataset.html !== html) {
+    sel.innerHTML = '<option value="">— Choisir —</option>' + html;
+    sel.dataset.html = html;
+    if (current && cfg.depenses.some(d => d.nom === current)) sel.value = current;
+  }
+}
+
+function renderJournal() {
+  const ops = getOps(state.month);
+  const list = $('journalList');
+  if (!ops.length) {
+    list.innerHTML = `<div class="empty-state"><div class="ico">📭</div><p>Aucune dépense en ${esc(monthLabel(state.month).toLowerCase())}.<br>Appuyez sur <b>+</b> pour en saisir une.</p></div>`;
+    return;
+  }
+  const total = ops.reduce((s, o) => s + o.montant, 0);
+  let html = `<div class="journal-head"><span>${plural(ops.length, 'dépense', 'dépenses')}</span><span>Total ${fmt(total)}</span></div>`;
+  for (const o of ops) {
+    const [, mm, dd] = o.date.split('-');
+    const who = o.auteur ? `<span class="who ${o.auteur === 'Laurie' ? 'laurie' : ''}">${esc(o.auteur)}</span>` : '';
+    if (state.confirmDel === o.id) {
+      html += `<div class="jour-entry confirm">
+        <div class="q">Supprimer cette dépense ?<small>${esc(o.categorie)} · ${fmt(o.montant)}</small></div>
+        <button class="mini-btn cancel" data-cancel>Annuler</button>
+        <button class="mini-btn del" data-confirm="${esc(o.id)}">Supprimer</button>
+      </div>`;
+      continue;
+    }
+    html += `<div class="jour-entry">
+      <span class="date-badge">${dd}/${mm}</span>
+      <div class="info">
+        <div class="cat">${esc(o.categorie)}</div>
+        <div class="libelle">${who}${esc(o.libelle || '')}${o.pending ? ' <span class="pending-tag">⏳ en attente</span>' : ''}</div>
+      </div>
+      <div class="amount">−${fmt(o.montant)}</div>
+      <button class="del-btn" data-del="${esc(o.id)}" aria-label="Supprimer">✕</button>
+    </div>`;
+  }
+  list.innerHTML = html;
+}
+
+// ── Paramètres ──
+function renderSettings() {
+  const cfg = getConfig();
+  const totRev = cfg.revenus.reduce((s, r) => s + r.montant, 0);
+  const totDep = cfg.depenses.reduce((s, d) => s + d.montant, 0);
+  const solde = totRev - totDep;
+  let h = '';
+
+  h += `<div class="section-title">Budget prévisionnel mensuel</div>
+    <div class="set-card"><div class="recap">
+      <div><div class="label">Revenus</div><div class="value">${fmt0(totRev)}</div></div>
+      <div><div class="label">Prévu</div><div class="value">${fmt0(totDep)}</div></div>
+      <div><div class="label">Solde</div><div class="value" style="color:var(--${solde < 0 ? 'red' : 'green'})">${solde > 0 ? '+' : ''}${fmt0(solde)}</div></div>
+    </div></div>`;
+
+  h += `<div class="section-title">💶 Revenus</div><div class="set-card bordered">`;
+  cfg.revenus.forEach((r, i) => {
+    h += `<button class="set-row" data-act="rev-edit" data-i="${i}"><span class="n">${esc(r.nom)}</span><span class="v">${fmt(r.montant)}</span><span class="chev">›</span></button>`;
+  });
+  h += `<button class="set-row add" data-act="rev-add">＋ Ajouter un revenu</button></div>`;
+
+  h += `<div class="section-title">🗂️ Groupes et catégories</div>`;
+  cfg.groupes.forEach((g, gi) => {
+    const cats = cfg.depenses.filter(d => d.groupe === g);
+    const tot = cats.reduce((s, d) => s + d.montant, 0);
+    h += `<div class="set-card bordered">
+      <div class="set-head"><span class="t">${esc(g)}</span><span class="s">${fmt(tot)}</span>
+        <button class="icon-btn" data-act="grp-edit" data-i="${gi}">✎ Renommer</button></div>`;
+    for (const d of cats) {
+      const i = cfg.depenses.indexOf(d);
+      h += `<button class="set-row" data-act="cat-edit" data-i="${i}"><span class="n">${esc(d.nom)}</span><span class="v">${fmt(d.montant)}</span><span class="chev">›</span></button>`;
+    }
+    h += `<button class="set-row add" data-act="cat-add" data-i="${gi}">＋ Ajouter une catégorie</button></div>`;
+  });
+  h += `<button class="btn-outline" data-act="grp-add">＋ Ajouter un groupe</button>`;
+
+  h += `<div class="section-title">📱 Ce téléphone</div>
+    <div class="set-card"><div class="set-body">
+      <span class="field-label">Je suis</span>
+      <div class="seg">${AUTEURS.map(a => `<button data-act="author" data-v="${a}" class="${state.author === a ? 'active' : ''}">${a}</button>`).join('')}</div>
+      <span class="field-label">Thème</span>
+      <div class="seg">${[['system', 'Auto'], ['light', 'Clair'], ['dark', 'Sombre']].map(([v, l]) => `<button data-act="theme" data-v="${v}" class="${state.theme === v ? 'active' : ''}">${l}</button>`).join('')}</div>
+    </div></div>`;
+
+  h += `<div class="section-title">🔄 Synchronisation</div>
+    <div class="set-card">
+      <div class="set-row static"><span class="n" id="setSyncText"></span></div>
+      <button class="set-row add" data-act="sync">Synchroniser maintenant</button>
+      ${CODE_FIXE ? '' : `<button class="set-row" data-act="code"><span class="n">Code famille</span><span class="v">${state.localOnly ? 'non utilisé' : '••••'}</span><span class="chev">›</span></button>`}
+    </div>
+    <p class="about">Les modifications sont enregistrées dans le Google Sheet<br>et apparaissent sur l'autre téléphone en moins de 30 secondes.</p>`;
+
+  $('settings').innerHTML = h;
+  renderSettingsSync();
+}
+function renderSettingsSync() {
+  const el = $('setSyncText');
+  if (el) el.textContent = $('syncText').textContent;
+}
+
+// ═══════════════════════════════════════════════════════════
+//  SAISIE
+// ═══════════════════════════════════════════════════════════
+function renderWho(container, value) {
+  container.querySelectorAll('[data-who]').forEach(b => b.classList.toggle('active', b.dataset.who === value));
+}
+function openSaisie(cat) {
+  switchTab('saisie');
+  if (cat) $('fCat').value = cat;
+  $('fDate').value = dateKey(new Date());
+  $('fErr').textContent = '';
+  renderWho($('fWho'), state.author);
+  if (cat) setTimeout(() => $('fMont').focus(), 60);
+}
+function setAuthor(a) { state.author = a; lsSet('author', a); renderWho($('fWho'), a); }
+
+$('fWho').addEventListener('click', e => {
+  const b = e.target.closest('[data-who]');
+  if (b) setAuthor(b.dataset.who);
+});
+
+$('opForm').addEventListener('submit', e => {
+  e.preventDefault();
+  const categorie = $('fCat').value;
+  const libelle = $('fLib').value.trim();
+  const montant = parseAmount($('fMont').value);
+  const date = $('fDate').value;
+  const err = $('fErr');
+  if (!state.author) { err.textContent = 'Indiquez qui saisit (Paul ou Laurie).'; return; }
+  if (!categorie) { err.textContent = 'Choisissez une catégorie.'; return; }
+  if (!(montant > 0)) { err.textContent = 'Indiquez un montant valide (ex : 12,50).'; $('fMont').focus(); return; }
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) { err.textContent = 'Indiquez la date.'; return; }
+  err.textContent = '';
+
+  addOperation({ id: uid(), date, categorie, libelle, montant, auteur: state.author });
+  $('fLib').value = '';
+  $('fMont').value = '';
+  document.activeElement && document.activeElement.blur();
+  const autreMois = date.slice(0, 7) !== state.month;
+  toast('✓ ' + fmt(montant) + ' ajouté' + (autreMois ? ' en ' + monthLabel(date.slice(0, 7)).toLowerCase() : ''));
+  switchTab('budget');
+});
+
+// ═══════════════════════════════════════════════════════════
+//  ÉVÉNEMENTS : Budget / Journal / Paramètres
+// ═══════════════════════════════════════════════════════════
+$('catList').addEventListener('click', e => {
+  const card = e.target.closest('[data-cat]');
+  if (card) openSaisie(card.dataset.cat);
+});
+
+$('journalList').addEventListener('click', e => {
+  const del = e.target.closest('[data-del]');
+  const ok = e.target.closest('[data-confirm]');
+  if (del) { state.confirmDel = del.dataset.del; renderJournal(); }
+  else if (e.target.closest('[data-cancel]')) { state.confirmDel = null; renderJournal(); }
+  else if (ok) {
+    state.confirmDel = null;
+    deleteOperation(ok.dataset.confirm);
+    toast('Dépense supprimée');
+  }
+});
+
+$('settings').addEventListener('click', e => {
+  const b = e.target.closest('[data-act]');
+  if (!b) return;
+  const i = +b.dataset.i;
+  switch (b.dataset.act) {
+    case 'rev-edit': editRevenu(i); break;
+    case 'rev-add':  editRevenu(-1); break;
+    case 'cat-edit': editCategorie(i); break;
+    case 'cat-add':  editCategorie(-1, getConfig().groupes[i]); break;
+    case 'grp-edit': editGroupe(i); break;
+    case 'grp-add':  editGroupe(-1); break;
+    case 'author':   setAuthor(b.dataset.v); renderSettings(); toast('Ce téléphone : ' + b.dataset.v); break;
+    case 'theme':    setTheme(b.dataset.v); break;
+    case 'sync':     if (!canSync()) toast('Synchronisation non disponible'); sync(); break;
+    case 'code':     showWelcome(); break;
+  }
+});
+
+// ═══════════════════════════════════════════════════════════
+//  FEUILLE D'ÉDITION (revenus, catégories, groupes)
+// ═══════════════════════════════════════════════════════════
+let sheet = null;
+
+function field(id, label, value, attrs = '') {
+  return `<div class="field"><label for="${id}">${label}</label><input id="${id}" value="${esc(value)}" ${attrs}></div>`;
+}
+function openSheet(opts) {
+  sheet = opts;
+  $('editTitle').textContent = opts.title;
+  $('editFields').innerHTML = opts.fields;
+  $('editErr').textContent = '';
+  $('editSave').textContent = opts.saveLabel || 'Enregistrer';
+  const del = $('editDelete');
+  del.hidden = !opts.onDelete;
+  del.classList.remove('armed');
+  del.textContent = opts.deleteLabel || 'Supprimer';
+  $('editModal').hidden = false;
+  const first = $('editFields').querySelector('input');
+  if (first && opts.focus !== false) setTimeout(() => first.focus(), 80);
+}
+function closeSheet() { $('editModal').hidden = true; sheet = null; }
+
+$('editForm').addEventListener('submit', e => {
+  e.preventDefault();
+  if (!sheet) return;
+  const err = sheet.onSave();
+  if (err) { $('editErr').textContent = err; return; }
+  closeSheet();
+});
+$('editCancel').addEventListener('click', closeSheet);
+$('editModal').addEventListener('click', e => { if (e.target === e.currentTarget) closeSheet(); });
+$('editDelete').addEventListener('click', e => {
+  const b = e.currentTarget;
+  if (!sheet || !sheet.onDelete) return;
+  // Confirmation intégrée : 1er appui → « Confirmer », 2e appui → suppression
+  if (!b.classList.contains('armed')) {
+    b.classList.add('armed');
+    b.textContent = 'Appuyez à nouveau pour confirmer';
+    return;
+  }
+  const err = sheet.onDelete();
+  if (err) { $('editErr').textContent = err; return; }
+  closeSheet();
+});
+
+function editRevenu(i) {
+  const cfg = getConfig();
+  const r = i >= 0 ? cfg.revenus[i] : { nom: '', montant: 0 };
+  openSheet({
+    title: i >= 0 ? 'Modifier le revenu' : 'Nouveau revenu',
+    fields: field('eNom', 'Nom', r.nom, 'maxlength="60" placeholder="ex : Prime, allocations…"')
+          + field('eMont', 'Montant mensuel (€)', amountInput(r.montant), 'inputmode="decimal" class="amount" placeholder="0,00"'),
+    onSave() {
+      const nom = $('eNom').value.trim(), montant = parseAmount($('eMont').value);
+      if (!nom) return 'Indiquez un nom.';
+      if (isNaN(montant)) return 'Montant invalide (ex : 1 200,50).';
+      const c = getConfig();
+      if (i >= 0) c.revenus[i] = { nom, montant }; else c.revenus.push({ nom, montant });
+      saveConfig(c);
+      toast(i >= 0 ? 'Revenu modifié' : 'Revenu ajouté');
+    },
+    onDelete: i >= 0 ? () => {
+      const c = getConfig();
+      c.revenus.splice(i, 1);
+      saveConfig(c);
+      toast('Revenu supprimé');
+    } : null,
+  });
+}
+
+function editCategorie(i, groupeDefaut) {
+  const cfg = getConfig();
+  const d = i >= 0 ? cfg.depenses[i] : { nom: '', montant: 0, groupe: groupeDefaut || cfg.groupes[0] || '' };
+  const options = cfg.groupes.map(g => `<option ${g === d.groupe ? 'selected' : ''}>${esc(g)}</option>`).join('');
+  openSheet({
+    title: i >= 0 ? 'Modifier la catégorie' : 'Nouvelle catégorie',
+    fields: field('eNom', 'Nom', d.nom, 'maxlength="60" placeholder="ex : Restaurants"')
+          + field('eMont', 'Montant prévu par mois (€)', amountInput(d.montant), 'inputmode="decimal" class="amount" placeholder="0,00"')
+          + `<div class="field"><label for="eGrp">Groupe</label><select id="eGrp">${options}</select></div>`
+          + (i >= 0 ? '<p class="form-note">Renommer la catégorie met aussi à jour les dépenses déjà saisies. Si vous la supprimez, ses dépenses restent visibles dans « Hors budget ».</p>' : ''),
+    onSave() {
+      const nom = $('eNom').value.trim(), montant = parseAmount($('eMont').value), groupe = $('eGrp').value;
+      if (!nom) return 'Indiquez un nom.';
+      if (isNaN(montant)) return 'Montant invalide (ex : 150 ou 12,50).';
+      const c = getConfig();
+      if (c.depenses.some((x, j) => j !== i && sameName(x.nom, nom))) return 'Une catégorie porte déjà ce nom.';
+      const renames = i >= 0 && d.nom !== nom ? [{ from: d.nom, to: nom }] : [];
+      const cat = { nom, montant, groupe };
+      if (i >= 0) {
+        if (c.depenses[i].groupe !== groupe) { c.depenses.splice(i, 1); insertInGroup(c, cat); }
+        else c.depenses[i] = cat;
+      } else insertInGroup(c, cat);
+      saveConfig(c, renames);
+      if ($('fCat').value === d.nom && renames.length) $('fCat').value = nom;
+      toast(i >= 0 ? 'Catégorie enregistrée' : 'Catégorie ajoutée');
+    },
+    onDelete: i >= 0 ? () => {
+      const c = getConfig();
+      c.depenses.splice(i, 1);
+      saveConfig(c);
+      toast('Catégorie supprimée');
+    } : null,
+  });
+}
+// Place une catégorie à la fin de son groupe
+function insertInGroup(c, cat) {
+  let pos = -1;
+  c.depenses.forEach((x, j) => { if (x.groupe === cat.groupe) pos = j; });
+  if (pos < 0) c.depenses.push(cat); else c.depenses.splice(pos + 1, 0, cat);
+}
+
+function editGroupe(i) {
+  const cfg = getConfig();
+  const nomActuel = i >= 0 ? cfg.groupes[i] : '';
+  const vide = i >= 0 && !cfg.depenses.some(d => d.groupe === nomActuel);
+  openSheet({
+    title: i >= 0 ? 'Renommer le groupe' : 'Nouveau groupe',
+    fields: field('eNom', 'Nom du groupe', nomActuel, 'maxlength="60" placeholder="ex : 🎉 Loisirs"')
+          + '<p class="form-note">Astuce : commencez par un emoji (🎉, 🍽️, 🐾…) pour le repérer facilement.</p>',
+    onSave() {
+      const nom = $('eNom').value.trim();
+      if (!nom) return 'Indiquez un nom.';
+      const c = getConfig();
+      if (c.groupes.some((g, j) => j !== i && sameName(g, nom))) return 'Un groupe porte déjà ce nom.';
+      if (i >= 0) {
+        c.groupes[i] = nom;
+        c.depenses.forEach(d => { if (d.groupe === nomActuel) d.groupe = nom; });
+      } else c.groupes.push(nom);
+      saveConfig(c);
+      toast(i >= 0 ? 'Groupe renommé' : 'Groupe ajouté');
+    },
+    deleteLabel: 'Supprimer ce groupe vide',
+    onDelete: vide ? () => {
+      const c = getConfig();
+      c.groupes.splice(i, 1);
+      saveConfig(c);
+      toast('Groupe supprimé');
+    } : null,
+  });
+}
+
+// ═══════════════════════════════════════════════════════════
+//  CHOIX DU MOIS
+// ═══════════════════════════════════════════════════════════
+let modalYear = +state.month.slice(0, 4);
+function renderMonthModal() {
+  $('yearLabel').textContent = modalYear;
+  const now = monthKey(new Date());
+  $('monthList').innerHTML = MOIS.map((m, i) => {
+    const k = modalYear + '-' + pad(i + 1);
+    return `<button class="month-opt${k === state.month ? ' active' : ''}${k === now ? ' now' : ''}" data-m="${k}">${m}</button>`;
+  }).join('');
+}
+function setMonth(m) {
+  state.month = m;
+  state.confirmDel = null;
+  $('monthModal').hidden = true;
+  renderAll();
+  sync();
+}
+$('monthBtn').addEventListener('click', () => { modalYear = +state.month.slice(0, 4); renderMonthModal(); $('monthModal').hidden = false; });
+$('yearPrev').addEventListener('click', () => { modalYear--; renderMonthModal(); });
+$('yearNext').addEventListener('click', () => { modalYear++; renderMonthModal(); });
+$('monthList').addEventListener('click', e => { const b = e.target.closest('[data-m]'); if (b) setMonth(b.dataset.m); });
+$('monthNow').addEventListener('click', () => setMonth(monthKey(new Date())));
+$('monthModal').addEventListener('click', e => { if (e.target === e.currentTarget) e.currentTarget.hidden = true; });
+
+// ═══════════════════════════════════════════════════════════
+//  ACCUEIL (qui suis-je + code famille)
+// ═══════════════════════════════════════════════════════════
+let welcomeWho = '';
+function showWelcome(message) {
+  welcomeWho = state.author;
+  renderWho($('wWho'), welcomeWho);
+  $('wCodeField').hidden = !!CODE_FIXE || !SCRIPT_URL;
+  $('wCode').value = '';
+  $('wErr').textContent = message || '';
+  $('wSkip').hidden = !!SCRIPT_URL;
+  $('welcomeLead').textContent = SCRIPT_URL
+    ? 'Le budget de la famille, partagé entre vos deux téléphones.'
+    : "L'application n'est pas encore reliée au Google Sheet (fichier script-url.js vide — voir le guide, étape 4).";
+  $('wGo').disabled = false;
+  $('wGo').textContent = 'Commencer';
+  $('welcome').hidden = false;
+}
+$('wWho').addEventListener('click', e => {
+  const b = e.target.closest('[data-who]');
+  if (b) { welcomeWho = b.dataset.who; renderWho($('wWho'), welcomeWho); }
+});
+$('wSkip').addEventListener('click', () => {
+  if (!welcomeWho) { $('wErr').textContent = 'Choisissez Paul ou Laurie.'; return; }
+  setAuthor(welcomeWho);
+  state.localOnly = true; lsSet('localOnly', true);
+  $('welcome').hidden = true;
+  renderAll(); sync();
+});
+$('welcomeForm').addEventListener('submit', async e => {
+  e.preventDefault();
+  const err = $('wErr');
+  if (!welcomeWho) { err.textContent = 'Choisissez Paul ou Laurie.'; return; }
+  if (!SCRIPT_URL) { err.textContent = "Relier d'abord l'app au Google Sheet, ou continuer sans synchronisation."; return; }
+  const code = CODE_FIXE || $('wCode').value.trim();
+  if (!code) { err.textContent = 'Saisissez le code famille.'; $('wCode').focus(); return; }
+  err.textContent = '';
+  $('wGo').disabled = true; $('wGo').textContent = 'Vérification…';
+  const ancien = state.code;
+  state.code = code;
+  try {
+    await api({ action: 'getAll', month: state.month });
+    if (!CODE_FIXE) lsSet('code', code);
+    state.localOnly = false; lsSet('localOnly', false);
+    setAuthor(welcomeWho);
+    $('welcome').hidden = true;
+    toast('Bienvenue ' + welcomeWho + ' !');
+    renderAll();
+    sync();
+  } catch (x) {
+    state.code = ancien;
+    err.textContent = x.kind === 'code' ? 'Code incorrect. Vérifiez auprès de Paul.'
+      : x.kind === 'config' ? "Le code n'a pas encore été choisi dans le script Google."
+      : x.kind === 'offline' || x.kind === 'unreachable' ? 'Pas de connexion au serveur. Vérifiez internet puis réessayez.'
+      : 'Erreur : ' + x.message;
+  } finally {
+    $('wGo').disabled = false; $('wGo').textContent = 'Commencer';
+  }
+});
+
+// ═══════════════════════════════════════════════════════════
+//  TOAST
+// ═══════════════════════════════════════════════════════════
+let toastTimer;
+function toast(msg) {
+  const t = $('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 2400);
+}
+
+// ═══════════════════════════════════════════════════════════
+//  DÉMARRAGE
+// ═══════════════════════════════════════════════════════════
+applyTheme();
+$('themeBtn').addEventListener('click', () => {
+  setTheme(state.theme === 'system' ? 'light' : state.theme === 'light' ? 'dark' : 'system');
+  toast('Thème : ' + ({ system: 'automatique', light: 'clair', dark: 'sombre' })[state.theme]);
+});
+document.querySelectorAll('.tab-btn').forEach(b => b.addEventListener('click', () => {
+  if (b.dataset.tab === 'saisie') openSaisie(); else switchTab(b.dataset.tab);
+}));
+$('fab').addEventListener('click', () => openSaisie());
+$('syncLine').addEventListener('click', () => { if (canSync()) sync(); });
+
+$('fDate').value = dateKey(new Date());
+renderWho($('fWho'), state.author);
+renderAll();
+
+if (!state.author || (!state.code && !state.localOnly)) showWelcome();
+sync();
+
+// Rafraîchissement automatique
+setInterval(() => { if (document.visibilityState === 'visible') sync(); }, RAFRAICHISSEMENT_MS);
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState !== 'visible') return;
+  // Nouveau mois depuis la dernière ouverture ? On suit le calendrier.
+  const now = monthKey(new Date());
+  if (state.month !== now && lsGet('openMonth', now) !== now) state.month = now;
+  lsSet('openMonth', now);
+  $('fDate').value = dateKey(new Date());
+  renderAll();
+  sync();
+});
+lsSet('openMonth', monthKey(new Date()));
+window.addEventListener('online', () => sync());
+window.addEventListener('offline', () => setSync('offline'));
+
+// Application hors ligne (service worker)
+if ('serviceWorker' in navigator && location.protocol !== 'file:') {
+  navigator.serviceWorker.register('sw.js').catch(() => {});
+}
+</script>
+</body>
+</html>
