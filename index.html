@@ -37,11 +37,22 @@
   --red:       #c0392b;
   --red-l:     #fdecea;
   --shadow:    0 4px 20px rgba(0,0,0,.18);
+  /* Type de charge (fond + cadre des widgets : bleu = fixe, rose = variable) — jamais utilisé pour l'état du budget */
+  --fixe:        #1f5fbf;
+  --fixe-bg:     #eef4fd;
+  --fixe-border: #6f9fe3;
+  --fixe-tag:    #dbe8fb;
+  --var:         #b0277a;
+  --var-bg:      #fdf0f7;
+  --var-border:  #e68bbf;
+  --var-tag:     #fbdcee;
+  --track:       rgba(0,0,0,.09);
   --radius:    14px;
   --radius-s:  8px;
   --font:      'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
   color-scheme: light;
 
+  --app-w:       480px;
   --safe-top:    env(safe-area-inset-top, 0px);
   --safe-bottom: env(safe-area-inset-bottom, 0px);
   --safe-left:   env(safe-area-inset-left, 0px);
@@ -67,6 +78,15 @@
     --red:       #e05a4e;
     --red-l:     #2a0e0c;
     --shadow:    0 4px 20px rgba(0,0,0,.5);
+    --fixe:        #8cbaff;
+    --fixe-bg:     #16233a;
+    --fixe-border: #4a7fcf;
+    --fixe-tag:    #213a60;
+    --var:         #ff9fd2;
+    --var-bg:      #33182a;
+    --var-border:  #c95a98;
+    --var-tag:     #522443;
+    --track:       rgba(255,255,255,.13);
     color-scheme: dark;
   }
 }
@@ -89,6 +109,15 @@
   --red:       #e05a4e;
   --red-l:     #2a0e0c;
   --shadow:    0 4px 20px rgba(0,0,0,.5);
+  --fixe:        #8cbaff;
+  --fixe-bg:     #16233a;
+  --fixe-border: #4a7fcf;
+  --fixe-tag:    #213a60;
+  --var:         #ff9fd2;
+  --var-bg:      #33182a;
+  --var-border:  #c95a98;
+  --var-tag:     #522443;
+  --track:       rgba(255,255,255,.13);
   color-scheme: dark;
 }
 
@@ -106,7 +135,7 @@ input, select { font-family: var(--font); }
   flex-direction: column;
   height: 100%;
   height: 100dvh;
-  max-width: 480px;
+  max-width: var(--app-w);
   margin: 0 auto;
   background: var(--bg);
   padding-left: var(--safe-left);
@@ -315,59 +344,146 @@ input, select { font-family: var(--font); }
   padding: 14px 2px 6px;
 }
 .cat-group-title .gt { font-variant-numeric: tabular-nums; letter-spacing: 0; text-transform: none; font-weight: 600; white-space: nowrap; }
-.cat-card {
-  width: 100%;
-  text-align: left;
-  background: var(--surface);
-  border-radius: var(--radius);
-  padding: 13px 14px 13px 16px;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  border: 1px solid var(--border);
-  margin-bottom: 7px;
-  transition: transform .1s;
-  position: relative;
-  overflow: hidden;
-  color: var(--fg);
+/* Barre d'outils + légende */
+.budget-bar {
+  position: sticky; top: 0; z-index: 20;
+  display: flex; align-items: center; gap: 8px;
+  padding: 0 16px 8px; background: var(--bg);
 }
-.cat-card:active { transform: scale(.985); }
-.cat-card::before {
-  content: '';
-  position: absolute;
-  left: 0; top: 0; bottom: 0;
-  width: 4px;
-  border-radius: 4px 0 0 4px;
-  background: var(--accent);
+.budget-bar .hint { flex: 1; font-size: 12.5px; color: var(--fg2); font-weight: 600; line-height: 1.3; }
+.chip-btn {
+  background: var(--surface2); color: var(--fg2);
+  border-radius: 20px; padding: 7px 12px; min-height: 36px;
+  font-size: 12.5px; font-weight: 600; white-space: nowrap;
 }
-.cat-card.ok::before { background: var(--green); }
-.cat-card.warn::before { background: var(--orange); }
-.cat-card.over::before { background: var(--red); }
-.cat-info { flex: 1; min-width: 0; }
-.cat-name { font-size: 14px; font-weight: 600; color: var(--fg); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.cat-sub { font-size: 12px; color: var(--fg3); margin-top: 1px; font-variant-numeric: tabular-nums; }
-.cat-right { text-align: right; flex-shrink: 0; }
-.cat-restant { font-size: 16px; font-weight: 700; font-variant-numeric: tabular-nums; }
-.cat-restant-l { font-size: 10px; font-weight: 600; color: var(--fg3); text-transform: uppercase; letter-spacing: .4px; }
-.cat-restant.ok { color: var(--green); }
-.cat-restant.warn { color: var(--orange); }
-.cat-restant.over { color: var(--red); }
-.cat-bar {
-  height: 4px;
-  border-radius: 2px;
-  background: var(--surface2);
-  margin-top: 8px;
-  overflow: hidden;
+.chip-btn.primary { background: var(--accent); color: var(--on-accent); }
+.legend {
+  margin: 0 16px 10px; padding: 10px 12px;
+  background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+  display: grid; grid-template-columns: 1fr 1fr; gap: 8px 12px;
+  font-size: 12px; color: var(--fg2); font-weight: 500;
 }
-.cat-bar-fill {
-  height: 100%;
-  border-radius: 2px;
-  background: var(--green);
-  transition: width .3s ease;
-}
-.cat-bar-fill.warn { background: var(--orange); }
-.cat-bar-fill.over { background: var(--red); }
+.legend .li { display: flex; align-items: center; gap: 7px; min-width: 0; }
+.legend .lg-title { grid-column: 1 / -1; font-size: 10.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .6px; color: var(--fg3); }
+.legend .lg-title + .li, .legend .sep { margin-top: -2px; }
+.legend .sep { grid-column: 1 / -1; border-top: 1px solid var(--border); }
+.lg-box { width: 20px; height: 15px; border-radius: 4px; border: 1.5px solid; flex-shrink: 0; }
+.lg-box.fixe { background: var(--fixe-bg); border-color: var(--fixe-border); }
+.lg-box.var  { background: var(--var-bg);  border-color: var(--var-border); }
+.lg-bar { width: 20px; height: 6px; border-radius: 3px; flex-shrink: 0; }
+.lg-bar.ok { background: var(--green); } .lg-bar.warn { background: var(--orange); } .lg-bar.over { background: var(--red); }
 
+/* Grille de widgets */
+/* Une famille = un widget de synthèse + ses catégories en lignes */
+@media (min-width: 600px) { :root { --app-w: 680px; } }
+.groups { margin: 0 16px; }
+.fam { margin-bottom: 14px; }
+.fam-card {
+  position: relative;
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px 13px;
+  box-shadow: 0 1px 3px rgba(0,0,0,.06);
+  cursor: pointer;
+  user-select: none; -webkit-user-select: none; -webkit-touch-callout: none;
+  transition: transform .12s;
+}
+.fam-card:active { transform: scale(.985); }
+.fam-top { display: flex; align-items: center; gap: 8px; min-height: 24px; }
+.fam-name { flex: 1; min-width: 0; font-size: 15px; font-weight: 700; letter-spacing: -.1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.fam-chev { color: var(--fg3); font-size: 13px; transition: transform .2s; flex-shrink: 0; width: 18px; text-align: center; }
+.fam.closed .fam-chev { transform: rotate(-90deg); }
+.fam-mid { display: flex; align-items: flex-end; justify-content: space-between; gap: 10px; margin-top: 6px; }
+.fam-meta { text-align: right; font-size: 12px; color: var(--fg2); font-variant-numeric: tabular-nums; line-height: 1.45; white-space: nowrap; }
+.fam-meta b { font-weight: 600; color: var(--fg); }
+.fam-lines { margin-top: 7px; padding-left: 8px; border-left: 2px solid var(--border); margin-left: 6px; }
+.fam.closed .fam-lines { display: none; }
+.w-label { font-size: 10px; font-weight: 600; color: var(--fg3); text-transform: uppercase; letter-spacing: .4px; }
+.w-rest { font-size: 24px; font-weight: 700; font-variant-numeric: tabular-nums; line-height: 1.1; white-space: nowrap; letter-spacing: -.4px; }
+.w-rest.ok, .cat-restant.ok { color: var(--green); }
+.w-rest.warn, .cat-restant.warn { color: var(--orange); }
+.w-rest.over, .cat-restant.over { color: var(--red); }
+.w-bar, .cat-bar { height: 6px; border-radius: 3px; background: var(--track); margin-top: 9px; overflow: hidden; }
+.cat-bar { height: 4px; margin-top: 7px; }
+.w-fill { height: 100%; border-radius: 3px; background: var(--green); transition: width .3s ease; }
+.w-fill.warn { background: var(--orange); } .w-fill.over { background: var(--red); }
+.w-badge {
+  font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .3px;
+  padding: 2px 6px; border-radius: 10px; background: var(--red); color: #fff; white-space: nowrap; flex-shrink: 0;
+}
+.empty-fam { font-size: 12.5px; color: var(--fg3); padding: 10px 4px; font-weight: 500; }
+
+/* Ligne de catégorie (couleur = type de charge : bleu fixe / rose variable) */
+.line {
+  --tc: var(--fg3); --tbg: var(--surface); --ttag: var(--surface2); --tborder: var(--border);
+  position: relative;
+  display: flex; align-items: center; gap: 10px;
+  background: var(--tbg);
+  border: 1px solid var(--tborder);
+  border-radius: var(--radius-s);
+  padding: 10px 2px 10px 14px;
+  margin-bottom: 6px;
+  min-height: 64px;
+  color: var(--fg);
+  cursor: pointer;
+  overflow: hidden;
+  user-select: none; -webkit-user-select: none; -webkit-touch-callout: none;
+  transition: transform .1s, opacity .2s;
+}
+.line::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 4px; background: var(--tc); }
+.line.fixe { --tc: var(--fixe); --tbg: var(--fixe-bg); --ttag: var(--fixe-tag); --tborder: var(--fixe-border); }
+.line.var  { --tc: var(--var);  --tbg: var(--var-bg);  --ttag: var(--var-tag);  --tborder: var(--var-border); }
+.line:active { transform: scale(.985); }
+.cat-info { flex: 1; min-width: 0; }
+.line-name { display: flex; align-items: center; gap: 6px; min-width: 0; }
+.line-name .n { font-size: 14px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.cat-sub .w-tag { margin-right: 3px; vertical-align: 1px; }
+.cat-sub { font-size: 12px; color: var(--fg2); margin-top: 3px; font-variant-numeric: tabular-nums; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.cat-right { text-align: right; flex-shrink: 0; }
+.cat-restant { font-size: 15px; font-weight: 700; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.cat-restant-l { font-size: 9.5px; font-weight: 600; color: var(--fg3); text-transform: uppercase; letter-spacing: .4px; }
+.w-tag {
+  font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .5px;
+  padding: 2px 6px; border-radius: 10px; background: var(--ttag); color: var(--tc); white-space: nowrap; flex-shrink: 0;
+}
+.line.paid .cat-info, .line.paid .cat-right { opacity: .5; }
+
+/* Coche « payé en une fois » : zone de tap 44 × 48 px */
+.w-check {
+  flex-shrink: 0;
+  width: 44px; height: 48px;
+  display: flex; align-items: center; justify-content: center;
+}
+.w-check i {
+  width: 26px; height: 26px; border-radius: 50%;
+  border: 2px solid var(--tc); background: var(--surface);
+  display: flex; align-items: center; justify-content: center;
+  font-style: normal; font-size: 14px; font-weight: 800; color: transparent;
+  transition: background .15s, transform .15s;
+}
+.w-check:active i { transform: scale(.85); }
+.line.paid .w-check i { background: var(--tc); color: var(--tbg); }
+
+/* Mode réorganisation */
+.w-grip { display: none; flex-shrink: 0; width: 34px; text-align: center; font-size: 18px; color: var(--fg3); line-height: 1; }
+.line .w-grip { color: var(--tc); }
+.groups.editing .w-check, .groups.editing .fam-chev { display: none; }
+.groups.editing .w-grip { display: block; }
+.groups.editing .fam-card, .groups.editing .line { animation: wiggle .3s ease-in-out infinite alternate; cursor: grab; }
+.groups.editing .line:nth-child(2n), .groups.editing .fam:nth-child(2n) .fam-card { animation-delay: -.15s; animation-direction: alternate-reverse; }
+.groups.editing .fam-card:active, .groups.editing .line:active { transform: none; }
+.groups.moving-fam .fam-lines { display: none; }
+@keyframes wiggle { from { transform: rotate(-.45deg); } to { transform: rotate(.45deg); } }
+.drag-src { opacity: .3; animation: none !important; outline: 2px dashed var(--fg3); outline-offset: 2px; }
+.w-ghost {
+  position: fixed; z-index: 600; margin: 0; pointer-events: none;
+  box-shadow: var(--shadow); opacity: .96;
+  animation: none !important; transition: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .groups.editing .fam-card, .groups.editing .line { animation: none; outline: 2px dashed var(--border); outline-offset: 2px; }
+}
 /* ── JOURNAL ────────────────────────────────────────── */
 .journal-section { margin: 4px 16px 0; }
 .journal-head { display: flex; justify-content: space-between; font-size: 12px; font-weight: 600; color: var(--fg3); padding: 6px 2px 8px; font-variant-numeric: tabular-nums; }
@@ -396,8 +512,7 @@ input, select { font-family: var(--font); }
 .jour-entry .info { flex: 1; min-width: 0; }
 .jour-entry .cat { font-size: 13px; font-weight: 600; color: var(--fg); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .jour-entry .libelle { font-size: 12px; color: var(--fg3); margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.who { display: inline-block; font-size: 10.5px; font-weight: 700; padding: 1px 6px; border-radius: 10px; background: var(--accent-l); color: var(--accent); margin-right: 4px; vertical-align: 1px; }
-.who.laurie { background: var(--orange-l); color: var(--orange); }
+.who { display: inline-block; font-size: 10.5px; font-weight: 700; padding: 1px 6px; border-radius: 10px; background: var(--surface2); color: var(--fg2); border: 1px solid var(--border); margin-right: 4px; vertical-align: 1px; }
 .pending-tag { font-size: 11px; color: var(--orange); font-weight: 600; }
 .jour-entry .amount { font-size: 15px; font-weight: 700; color: var(--red); font-variant-numeric: tabular-nums; flex-shrink: 0; }
 .jour-entry .del-btn {
@@ -459,6 +574,35 @@ input, select { font-family: var(--font); }
 .set-row .n { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 500; }
 .set-row .v { font-variant-numeric: tabular-nums; color: var(--fg2); font-weight: 600; white-space: nowrap; }
 .set-row .chev { color: var(--fg3); font-size: 16px; }
+/* Ligne de catégorie avec interrupteur « Charge fixe » */
+.set-row.cat-row { padding: 0; gap: 0; }
+.set-row.cat-row:active { background: none; }
+.row-main {
+  flex: 1; min-width: 0; display: flex; align-items: center; gap: 10px;
+  padding: 12px 4px 12px 16px; min-height: 48px; text-align: left; font-size: 14px; color: var(--fg);
+}
+.row-main:active { background: var(--surface2); }
+.sw-wrap {
+  display: flex; align-items: center; gap: 7px; flex-shrink: 0;
+  min-height: 48px; padding: 0 14px 0 8px;
+  font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .3px;
+  color: var(--var); width: 104px; justify-content: flex-end;
+}
+.sw-wrap.on { color: var(--fixe); }
+.sw { width: 40px; height: 24px; border-radius: 12px; background: var(--var-border); position: relative; flex-shrink: 0; transition: background .15s; }
+.sw::after {
+  content: ''; position: absolute; top: 3px; left: 3px; width: 18px; height: 18px; border-radius: 50%;
+  background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,.3); transition: transform .15s;
+}
+.sw-wrap.on .sw { background: var(--fixe-border); }
+.sw-wrap.on .sw::after { transform: translateX(16px); }
+.switch-field {
+  display: flex; align-items: center; justify-content: space-between; gap: 10px;
+  background: var(--surface2); border: 1.5px solid var(--border); border-radius: var(--radius-s);
+  padding: 0 0 0 13px; margin-bottom: 12px; font-size: 15px; font-weight: 600; color: var(--fg);
+}
+.switch-field small { display: block; font-size: 12px; font-weight: 500; color: var(--fg3); }
+.set-warn { margin: 0 2px 10px; padding: 10px 12px; border-radius: var(--radius-s); background: var(--surface2); border: 1px solid var(--border); font-size: 12.5px; line-height: 1.45; color: var(--fg2); }
 .set-row.add { color: var(--accent); font-weight: 600; }
 .set-row.static:active { background: none; }
 .set-body { padding: 12px 16px; }
@@ -478,7 +622,7 @@ input, select { font-family: var(--font); }
 .fab {
   position: fixed;
   bottom: calc(20px + var(--safe-bottom));
-  right: max(20px, calc(50% - 240px + 20px));
+  right: max(20px, calc(50% - var(--app-w) / 2 + 20px));
   background: var(--accent);
   color: var(--on-accent);
   border-radius: 50%;
@@ -622,7 +766,24 @@ input, select { font-family: var(--font); }
   <main class="content" id="content">
     <!-- Onglet Budget -->
     <section class="panel active" id="tab-budget">
-      <div class="cat-section" id="catList"></div>
+      <div class="budget-bar">
+        <span class="hint" id="budgetHint"></span>
+        <button class="chip-btn" id="legendBtn" aria-expanded="false">ⓘ Légende</button>
+        <button class="chip-btn" id="reorgBtn">↕ Réorganiser</button>
+      </div>
+      <div class="legend" id="legend" hidden>
+        <div class="lg-title">Type de charge (couleur des lignes)</div>
+        <div class="li"><i class="lg-box fixe"></i>Fixe</div>
+        <div class="li"><i class="lg-box var"></i>Variable</div>
+        <div class="sep"></div>
+        <div class="lg-title">État du budget (barre et restant)</div>
+        <div class="li"><i class="lg-bar ok"></i>OK (&lt; 80 %)</div>
+        <div class="li"><i class="lg-bar warn"></i>Bientôt épuisé</div>
+        <div class="li"><i class="lg-bar over"></i>Dépassé</div>
+        <div class="li">✓ Payé en une fois</div>
+      </div>
+      <div class="groups" id="catGrid"></div>
+      <div class="cat-section" id="orphanList"></div>
     </section>
 
     <!-- Onglet Saisir -->
@@ -813,6 +974,9 @@ const state = {
   sync: 'idle',
   syncMsg: '',
   confirmDel: null,                         // id en cours de confirmation (Journal)
+  reorder: false,                           // mode « Réorganiser » des widgets
+  editLayout: null,                         // { famille: [noms] } pendant la réorganisation
+  apiVersion: lsGet('apiVersion', 2),       // version du script Google (2 = gère « fixe »)
 };
 const opsCache = {};                        // { 'AAAA-MM': [op, …] } (copie du Sheet)
 
@@ -1000,7 +1164,23 @@ async function fetchMonth(m) {
   }
   setServerConfig(config);
   saveOpsCache(m, r.ops || []);
+  state.apiVersion = r.apiVersion || 1;
+  lsSet('apiVersion', state.apiVersion);
+  migrerFixe();
   renderAll();
+}
+
+// Une seule fois : renseigne la colonne « fixe » des catégories qui n'en ont pas encore
+// (uniquement si le script Google sait l'enregistrer, pour ne pas renvoyer en boucle)
+let fixeMigre = false;
+function migrerFixe() {
+  if (fixeMigre || state.apiVersion < 2 || state.queue.some(q => q.type === 'config')) return;
+  fixeMigre = true;
+  const cfg = getConfig();
+  const manquants = cfg.depenses.filter(d => typeof d.fixe !== 'boolean');
+  if (!manquants.length) return;
+  manquants.forEach(d => { d.fixe = fixeParDefaut(d); });
+  saveConfig(cfg);
 }
 
 function setServerConfig(c) {
@@ -1068,11 +1248,12 @@ darkMq.addEventListener && darkMq.addEventListener('change', applyTheme);
 //  ONGLETS
 // ═══════════════════════════════════════════════════════════
 function switchTab(name) {
+  if (state.reorder && name !== 'budget') finishReorder();
   state.tab = name;
   state.confirmDel = null;
   document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === name));
   document.querySelectorAll('.panel').forEach(p => p.classList.toggle('active', p.id === 'tab-' + name));
-  $('fab').hidden = name === 'saisie';
+  $('fab').hidden = name === 'saisie' || state.reorder;
   $('content').scrollTop = 0;
   if (name === 'journal') renderJournal();
   if (name === 'params') renderSettings();
@@ -1081,20 +1262,37 @@ function switchTab(name) {
 // ═══════════════════════════════════════════════════════════
 //  CALCULS
 // ═══════════════════════════════════════════════════════════
-function status(spent, planned) {
+// État du budget : 'ok' (vert), 'warn' (orange, > 80 %), 'over' (rouge, dépassé)
+function status(spent, planned, paid) {
   if (spent > planned + 0.004) return 'over';
+  if (paid) return 'ok'; // réglé en une fois : rien de plus à dépenser
   if (planned > 0 && spent / planned > 0.8) return 'warn';
   return 'ok';
 }
+const AUTO_PREFIX = 'auto-';
+const isAuto = o => String(o.id).startsWith(AUTO_PREFIX);
+
+// Charge fixe ? (valeur du Sheet, sinon valeur par défaut d'après le nom/groupe)
+const sansAccents = s => String(s || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
+function fixeParDefaut(d) {
+  const g = sansAccents(d.groupe), n = sansAccents(d.nom);
+  if (/logement|credit|assurance|charges maison|abonnement|epargne/.test(g)) return true;
+  return /credit|\bptz\b|impot|assurance|electricite|\beau\b|alarme|internet|netflix|amazon|deezer|darty|casden|\bpel\b|cotisation|nounou/.test(n);
+}
+const isFixe = d => typeof d.fixe === 'boolean' ? d.fixe : fixeParDefaut(d);
+
 function monthStats() {
   const cfg = getConfig();
   const ops = getOps(state.month);
-  const byCat = {};
-  for (const o of ops) byCat[o.categorie] = r2((byCat[o.categorie] || 0) + o.montant);
+  const byCat = {}, autoByCat = {};
+  for (const o of ops) {
+    byCat[o.categorie] = r2((byCat[o.categorie] || 0) + o.montant);
+    if (isAuto(o)) (autoByCat[o.categorie] = autoByCat[o.categorie] || []).push(o.id);
+  }
   const revenus = r2(cfg.revenus.reduce((s, r) => s + r.montant, 0));
   const prevu = r2(cfg.depenses.reduce((s, d) => s + d.montant, 0));
   const depense = r2(ops.reduce((s, o) => s + o.montant, 0));
-  return { cfg, ops, byCat, revenus, prevu, depense };
+  return { cfg, ops, byCat, autoByCat, revenus, prevu, depense };
 }
 
 // ═══════════════════════════════════════════════════════════
@@ -1121,46 +1319,117 @@ function renderSummary({ revenus, depense }) {
   card.classList.toggle('warn', depense <= revenus + 0.004 && revenus > 0 && depense / revenus > 0.8);
 }
 
-function catCard(nom, prevu, spent) {
-  const restant = prevu - spent;
-  const st = status(spent, prevu);
+// Familles fermées (repliées) sur ce téléphone
+const famFermees = new Set(lsGet('famFermees', []));
+
+// Une ligne de catégorie. type : 'fixe' | 'var' | 'orphan'
+function ligneCat(nom, prevu, spent, type, paid) {
+  const restant = r2(prevu - spent);
+  const st = status(spent, prevu, paid);
   const pct = prevu > 0 ? Math.min(spent / prevu, 1) : (spent > 0 ? 1 : 0);
-  return `<button class="cat-card ${st}" data-cat="${esc(nom)}">
+  const tag = type === 'fixe' ? 'Fixe' : type === 'var' ? 'Variable' : 'Hors budget';
+  const check = type === 'orphan' ? '' :
+    `<button class="w-check" data-check aria-pressed="${paid}" aria-label="${paid ? 'Annuler le paiement' : 'Marquer comme payé'}"><i>✓</i></button>`;
+  return `<div class="line ${type}${paid ? ' paid' : ''}" data-cat="${esc(nom)}" role="button" tabindex="0">
       <div class="cat-info">
-        <div class="cat-name">${esc(nom)}</div>
-        <div class="cat-sub">Prévu ${fmt(prevu)} · Dépensé ${fmt(spent)}</div>
-        <div class="cat-bar"><div class="cat-bar-fill ${st}" style="width:${(pct * 100).toFixed(1)}%"></div></div>
+        <div class="line-name"><span class="n">${esc(nom)}</span></div>
+        <div class="cat-sub"><span class="w-tag">${tag}</span> ${fmt(spent)} / ${fmt(prevu)}${st === 'over' ? ' · <b style="color:var(--red)">Dépassé</b>' : ''}</div>
+        <div class="cat-bar"><div class="w-fill ${st}" style="width:${(pct * 100).toFixed(1)}%"></div></div>
       </div>
       <div class="cat-right">
         <div class="cat-restant ${st}">${fmt(restant)}</div>
-        <div class="cat-restant-l">${restant < 0 ? 'dépassé' : 'restant'}</div>
+        <div class="cat-restant-l">${paid ? 'payé' : restant < 0 ? 'dépassé' : 'restant'}</div>
       </div>
-    </button>`;
+      ${check}<span class="w-grip" aria-hidden="true">⠿</span>
+    </div>`;
 }
 
-function renderBudget({ cfg, byCat }) {
+// Le widget d'une famille + ses lignes
+function blocFamille(groupe, cats, byCat, autoByCat, orphelin) {
+  const prevu = cats.reduce((s, d) => s + d.montant, 0);
+  const spent = cats.reduce((s, d) => s + (byCat[d.nom] || 0), 0);
+  const payees = cats.filter(d => autoByCat[d.nom]).length;
+  const restant = r2(prevu - spent);
+  const st = status(spent, prevu, payees > 0 && payees === cats.length);
+  const pct = prevu > 0 ? Math.min(spent / prevu, 1) : (spent > 0 ? 1 : 0);
+  const ferme = famFermees.has(groupe) && !state.reorder;
+  const lignes = cats.map(d => orphelin
+    ? ligneCat(d.nom, 0, byCat[d.nom] || 0, 'orphan', false)
+    : ligneCat(d.nom, d.montant, byCat[d.nom] || 0, isFixe(d) ? 'fixe' : 'var', !!autoByCat[d.nom])).join('');
+  return `<section class="fam${ferme ? ' closed' : ''}" data-groupe="${esc(groupe)}">
+    <div class="fam-card" data-fam role="button" tabindex="0" aria-expanded="${!ferme}">
+      <div class="fam-top">
+        <span class="fam-name">${esc(groupe)}</span>
+        ${st === 'over' ? '<span class="w-badge">Dépassé</span>' : ''}
+        <span class="fam-chev" aria-hidden="true">▼</span><span class="w-grip" aria-hidden="true">⠿</span>
+      </div>
+      <div class="fam-mid">
+        <div><div class="w-label">Restant</div><div class="w-rest ${st}">${fmt(restant)}</div></div>
+        <div class="fam-meta"><b>${fmt(spent)}</b> / ${fmt(prevu)}<br>${orphelin ? plural(cats.length, 'catégorie', 'catégories')
+          : plural(cats.length, 'catégorie', 'catégories') + (payees ? ' · ' + payees + ' payée' + (payees > 1 ? 's' : '') : '')}</div>
+      </div>
+      <div class="w-bar"><div class="w-fill ${st}" style="width:${(pct * 100).toFixed(1)}%"></div></div>
+    </div>
+    <div class="fam-lines">${lignes || (state.reorder ? '<div class="empty-fam">Glissez une catégorie ici</div>' : '')}</div>
+  </section>`;
+}
+
+function renderBudget({ cfg, byCat, autoByCat }) {
+  if (drag) { budgetDirty = true; return; } // pas de redessin pendant un glisser-déposer
   let html = '';
-  for (const g of cfg.groupes) {
-    const cats = cfg.depenses.filter(d => d.groupe === g);
-    if (!cats.length) continue;
-    const gp = cats.reduce((s, d) => s + d.montant, 0);
-    const gs = cats.reduce((s, d) => s + (byCat[d.nom] || 0), 0);
-    html += `<div class="cat-group-title"><span>${esc(g)}</span><span class="gt">${fmt(gs)} / ${fmt(gp)}</span></div>`;
-    html += cats.map(d => catCard(d.nom, d.montant, byCat[d.nom] || 0)).join('');
+  for (const { groupe, cats } of budgetLayout(cfg)) {
+    if (!cats.length && !state.reorder) continue;
+    html += blocFamille(groupe, cats, byCat, autoByCat, false);
   }
+  $('catGrid').innerHTML = html;
+  $('catGrid').classList.toggle('editing', !!state.reorder);
+
   // Dépenses dont la catégorie n'existe plus
   const known = new Set(cfg.depenses.map(d => d.nom));
   const orphans = Object.keys(byCat).filter(c => !known.has(c));
+  let autres = '';
   if (orphans.length) {
-    html += `<div class="cat-group-title"><span>${HORS_BUDGET}</span></div>`;
-    html += orphans.map(c => catCard(c, 0, byCat[c])).join('');
+    autres = '<div class="groups">' + blocFamille(HORS_BUDGET, orphans.map(nom => ({ nom, montant: 0 })), byCat, {}, true) + '</div>';
   }
   if (!cfg.depenses.length && !orphans.length) {
-    html = `<div class="empty-state"><div class="ico">🗂️</div><p>Aucune catégorie.<br>Ajoutez-en dans l'onglet <b>Paramètres</b>.</p></div>`;
+    autres = `<div class="empty-state"><div class="ico">🗂️</div><p>Aucune catégorie.<br>Ajoutez-en dans l'onglet <b>Paramètres</b>.</p></div>`;
   }
-  $('catList').innerHTML = html;
+  $('orphanList').innerHTML = autres;
+
+  $('reorgBtn').textContent = state.reorder ? '✓ Terminé' : '↕ Réorganiser';
+  $('reorgBtn').classList.toggle('primary', !!state.reorder);
+  $('reorgBtn').hidden = cfg.depenses.length < 2;
+  $('legendBtn').hidden = !!state.reorder;
+  $('budgetHint').textContent = state.reorder ? 'Maintenez puis glissez une famille ou une catégorie' : '';
 }
 
+// Familles (dans l'ordre) et leurs catégories, ou la disposition en cours de modification
+function budgetLayout(cfg) {
+  let ordre = cfg.groupes.slice();
+  if (state.reorder && state.editLayout) {
+    ordre = state.editLayout.ordre.filter(g => cfg.groupes.includes(g)).concat(cfg.groupes.filter(g => !state.editLayout.ordre.includes(g)));
+  }
+  const lignes = ordre.map(g => ({ groupe: g, cats: [] }));
+  const parGroupe = new Map(lignes.map(l => [l.groupe, l]));
+  const places = new Set();
+  if (state.reorder && state.editLayout) {
+    for (const [g, noms] of Object.entries(state.editLayout.cats)) {
+      const l = parGroupe.get(g);
+      if (!l) continue;
+      for (const n of noms) {
+        const d = cfg.depenses.find(x => x.nom === n);
+        if (d && !places.has(n)) { l.cats.push(d); places.add(n); }
+      }
+    }
+  }
+  for (const d of cfg.depenses) {
+    if (places.has(d.nom)) continue;
+    let l = parGroupe.get(d.groupe);
+    if (!l) { l = { groupe: d.groupe, cats: [] }; lignes.push(l); parGroupe.set(d.groupe, l); }
+    l.cats.push(d);
+  }
+  return lignes;
+}
 function renderCatSelect(cfg) {
   const sel = $('fCat');
   const current = sel.value;
@@ -1232,6 +1501,10 @@ function renderSettings() {
   h += `<button class="set-row add" data-act="rev-add">＋ Ajouter un revenu</button></div>`;
 
   h += `<div class="section-title">🗂️ Groupes et catégories</div>`;
+  if (state.apiVersion < 2 && canSync()) {
+    h += `<p class="set-warn">⚠️ Le script Google n'est pas à jour : le choix <b>Fixe / Variable</b> ne peut pas encore être enregistré.
+      Recollez <b>Code.gs</b> puis <b>Déployer → Gérer les déploiements → ✏️ → Nouvelle version</b>.</p>`;
+  }
   cfg.groupes.forEach((g, gi) => {
     const cats = cfg.depenses.filter(d => d.groupe === g);
     const tot = cats.reduce((s, d) => s + d.montant, 0);
@@ -1240,7 +1513,11 @@ function renderSettings() {
         <button class="icon-btn" data-act="grp-edit" data-i="${gi}">✎ Renommer</button></div>`;
     for (const d of cats) {
       const i = cfg.depenses.indexOf(d);
-      h += `<button class="set-row" data-act="cat-edit" data-i="${i}"><span class="n">${esc(d.nom)}</span><span class="v">${fmt(d.montant)}</span><span class="chev">›</span></button>`;
+      const fixe = isFixe(d);
+      h += `<div class="set-row cat-row">
+        <button class="row-main" data-act="cat-edit" data-i="${i}"><span class="n">${esc(d.nom)}</span><span class="v">${fmt(d.montant)}</span></button>
+        <button class="sw-wrap${fixe ? ' on' : ''}" data-act="fixe" data-i="${i}" role="switch" aria-checked="${fixe}" aria-label="Charge fixe : ${esc(d.nom)}">${fixe ? 'Fixe' : 'Variable'}<span class="sw"></span></button>
+      </div>`;
     }
     h += `<button class="set-row add" data-act="cat-add" data-i="${gi}">＋ Ajouter une catégorie</button></div>`;
   });
@@ -1316,9 +1593,256 @@ $('opForm').addEventListener('submit', e => {
 // ═══════════════════════════════════════════════════════════
 //  ÉVÉNEMENTS : Budget / Journal / Paramètres
 // ═══════════════════════════════════════════════════════════
-$('catList').addEventListener('click', e => {
-  const card = e.target.closest('[data-cat]');
-  if (card) openSaisie(card.dataset.cat);
+// ── Budget : tap famille = replier/déplier, tap ligne = saisie, coche = payé ──
+let drag = null, budgetDirty = false, justDragged = false;
+
+function basculerFamille(fam) {
+  const g = fam.dataset.groupe;
+  const ferme = !fam.classList.contains('closed');
+  fam.classList.toggle('closed', ferme);
+  fam.querySelector('.fam-card').setAttribute('aria-expanded', String(!ferme));
+  if (ferme) famFermees.add(g); else famFermees.delete(g);
+  lsSet('famFermees', [...famFermees]);
+}
+function clicBudget(e) {
+  if (state.reorder || justDragged) return;
+  const line = e.target.closest('.line');
+  if (line) {
+    if (e.target.closest('[data-check]')) togglePaid(line.dataset.cat);
+    else openSaisie(line.dataset.cat);
+    return;
+  }
+  const card = e.target.closest('[data-fam]');
+  if (card) basculerFamille(card.closest('.fam'));
+}
+$('catGrid').addEventListener('click', clicBudget);
+$('orphanList').addEventListener('click', clicBudget);
+$('catGrid').addEventListener('keydown', e => {
+  if (state.reorder || (e.key !== 'Enter' && e.key !== ' ')) return;
+  const el = e.target;
+  if (el.classList.contains('line')) { e.preventDefault(); openSaisie(el.dataset.cat); }
+  else if (el.matches('[data-fam]')) { e.preventDefault(); basculerFamille(el.closest('.fam')); }
+});
+
+// Date de la dépense automatique : aujourd'hui si c'est le mois affiché,
+// sinon le dernier jour (mois passé) ou le premier jour (mois à venir)
+function payDate(m) {
+  const now = new Date(), cur = monthKey(now);
+  if (m === cur) return dateKey(now);
+  if (m < cur) { const [y, mm] = m.split('-').map(Number); return m + '-' + pad(new Date(y, mm, 0).getDate()); }
+  return m + '-01';
+}
+function togglePaid(nom) {
+  if (!state.author) { showWelcome(); return; }
+  const { cfg, byCat, autoByCat } = monthStats();
+  const autos = autoByCat[nom] || [];
+  if (autos.length) {
+    // N'annule que la (les) dépense(s) automatique(s), jamais les saisies manuelles
+    autos.forEach(id => deleteOperation(id));
+    toast('Paiement annulé · ' + nom);
+    return;
+  }
+  const d = cfg.depenses.find(x => x.nom === nom);
+  if (!d) return;
+  const restant = r2(d.montant - (byCat[nom] || 0));
+  if (restant <= 0) {
+    toast(d.montant > 0 ? 'Rien à payer : budget déjà entièrement dépensé' : 'Aucun montant prévu pour cette catégorie');
+    return;
+  }
+  addOperation({ id: AUTO_PREFIX + uid(), date: payDate(state.month), categorie: nom,
+                 libelle: 'Paiement mensuel', montant: restant, auteur: state.author });
+  toast('✓ ' + nom + ' payé · ' + fmt(restant));
+}
+
+// ── Légende ──
+function setLegend(open) {
+  $('legend').hidden = !open;
+  $('legendBtn').setAttribute('aria-expanded', String(open));
+  lsSet('legend', open);
+}
+$('legendBtn').addEventListener('click', () => setLegend($('legend').hidden));
+
+// ── Réorganisation : familles et lignes ──
+function lireLayout() {
+  const layout = { ordre: [], cats: {} };
+  document.querySelectorAll('#catGrid .fam').forEach(fam => {
+    const g = fam.dataset.groupe;
+    layout.ordre.push(g);
+    layout.cats[g] = [...fam.querySelectorAll('.line')].map(l => l.dataset.cat);
+  });
+  return layout;
+}
+function startReorder() {
+  state.reorder = true;
+  state.editLayout = null;
+  $('fab').hidden = true;
+  renderAll();
+  state.editLayout = lireLayout();
+}
+function finishReorder() {
+  const layout = state.editLayout || { ordre: [], cats: {} };
+  state.reorder = false;
+  state.editLayout = null;
+  $('fab').hidden = state.tab === 'saisie';
+  const cfg = getConfig();
+  const groupes = layout.ordre.filter(g => cfg.groupes.includes(g)).concat(cfg.groupes.filter(g => !layout.ordre.includes(g)));
+  // Catégories : famille par famille, de haut en bas ; une ligne glissée
+  // dans une autre famille change de groupe
+  const depenses = [], vus = new Set();
+  for (const g of groupes) {
+    for (const n of layout.cats[g] || []) {
+      const d = cfg.depenses.find(x => x.nom === n);
+      if (d && !vus.has(n)) { depenses.push({ ...d, groupe: g }); vus.add(n); }
+    }
+  }
+  for (const d of cfg.depenses) if (!vus.has(d.nom)) depenses.push(d);
+  const change = groupes.some((g, i) => g !== cfg.groupes[i]) ||
+    depenses.some((d, i) => d.nom !== cfg.depenses[i].nom || d.groupe !== cfg.depenses[i].groupe);
+  if (change) {
+    cfg.groupes = groupes;
+    cfg.depenses = depenses;
+    saveConfig(cfg); // → colonnes « ordre » et « groupe » de l'onglet Config
+    toast('Ordre enregistré');
+  } else renderAll();
+}
+$('reorgBtn').addEventListener('click', () => (state.reorder ? finishReorder() : startReorder()));
+
+// Glisser-déposer (doigt : appui maintenu ~0,2 s puis glisser ; souris : glisser)
+const HOLD_MS = 180, SLOP = 8;
+let pendingTouch = null;
+
+// Élément déplaçable sous le doigt : une ligne, ou une famille (par son widget)
+function cibleDrag(target) {
+  const line = target.closest('#catGrid .line');
+  if (line) return line;
+  const card = target.closest('#catGrid .fam-card');
+  return card ? card.closest('.fam') : null;
+}
+function dragStart(el, x, y) {
+  const famille = el.classList.contains('fam');
+  if (famille) {
+    // Familles repliées pendant le déplacement ; on recale le défilement
+    // pour que la famille saisie reste sous le doigt
+    const avant = el.getBoundingClientRect().top;
+    $('catGrid').classList.add('moving-fam');
+    $('content').scrollTop += el.getBoundingClientRect().top - avant;
+  }
+  const src = famille ? el.querySelector('.fam-card') : el;
+  const r = src.getBoundingClientRect();
+  const ghost = src.cloneNode(true);
+  ghost.classList.add('w-ghost');
+  Object.assign(ghost.style, { width: r.width + 'px', height: r.height + 'px', left: r.left + 'px', top: r.top + 'px' });
+  document.body.appendChild(ghost);
+  el.classList.add('drag-src');
+  drag = { el, famille, ghost, dx: x - r.left, dy: Math.min(y - r.top, r.height - 10), x, y, raf: 0 };
+  if (navigator.vibrate) navigator.vibrate(12);
+  drag.raf = requestAnimationFrame(autoScroll);
+}
+function dragMove(x, y) {
+  drag.x = x; drag.y = y;
+  drag.ghost.style.left = (x - drag.dx) + 'px';
+  drag.ghost.style.top = (y - drag.dy) + 'px';
+  dragReposition();
+}
+function dragReposition() {
+  const sous = document.elementFromPoint(drag.x, drag.y);
+  if (!sous) return;
+  const items = [...document.querySelectorAll(drag.famille ? '#catGrid .fam' : '#catGrid .line')];
+  let target = drag.famille ? sous.closest('#catGrid .fam') : sous.closest('#catGrid .line');
+  const avant = new Map(items.map(it => [it, it.getBoundingClientRect()]));
+  if (target && target !== drag.el) {
+    // Avant ou après l'élément visé, selon la moitié où se trouve le doigt
+    const r = target.getBoundingClientRect();
+    const apres = drag.y > r.top + r.height / 2;
+    if (apres ? target.nextElementSibling === drag.el : target.previousElementSibling === drag.el) return;
+    target.parentNode.insertBefore(drag.el, apres ? target.nextSibling : target);
+  } else if (!target && !drag.famille) {
+    // Ligne lâchée sur le widget ou la zone vide d'une autre famille : à la fin de celle-ci
+    const fam = sous.closest('#catGrid .fam');
+    const zone = fam && fam.querySelector('.fam-lines');
+    if (!zone || drag.el.parentNode === zone) return;
+    zone.insertBefore(drag.el, zone.querySelector('.empty-fam'));
+  } else return;
+  // Petite animation de glissement des autres éléments
+  for (const it of items) {
+    const a = avant.get(it), b = it.getBoundingClientRect();
+    if (it !== drag.el && (a.left !== b.left || a.top !== b.top) && it.animate) {
+      it.animate([{ transform: `translate(${a.left - b.left}px, ${a.top - b.top}px)` }, { transform: 'none' }], { duration: 160, easing: 'ease-out' });
+    }
+  }
+}
+// Défilement automatique quand on approche du haut ou du bas de l'écran
+function autoScroll() {
+  if (!drag) return;
+  const c = $('content'), r = c.getBoundingClientRect(), bord = 70;
+  let v = 0;
+  if (drag.y < r.top + bord) v = -Math.min(18, Math.ceil((r.top + bord - drag.y) / 4));
+  else if (drag.y > r.bottom - bord) v = Math.min(18, Math.ceil((drag.y - r.bottom + bord) / 4));
+  if (v) {
+    const avant = c.scrollTop;
+    c.scrollTop += v;
+    if (c.scrollTop !== avant) dragReposition();
+  }
+  drag.raf = requestAnimationFrame(autoScroll);
+}
+function dragEnd() {
+  if (!drag) return;
+  cancelAnimationFrame(drag.raf);
+  drag.ghost.remove();
+  drag.el.classList.remove('drag-src');
+  $('catGrid').classList.remove('moving-fam');
+  drag = null;
+  state.editLayout = lireLayout();
+  justDragged = true;
+  setTimeout(() => { justDragged = false; }, 80);
+  budgetDirty = false;
+  renderAll(); // met à jour les totaux des familles
+}
+
+const grid = $('catGrid');
+grid.addEventListener('touchstart', e => {
+  if (!state.reorder || e.touches.length !== 1) return;
+  const el = cibleDrag(e.target);
+  if (!el) return;
+  const t = e.touches[0];
+  pendingTouch = { el, x: t.clientX, y: t.clientY };
+  pendingTouch.timer = setTimeout(() => {
+    if (pendingTouch) { dragStart(pendingTouch.el, pendingTouch.x, pendingTouch.y); pendingTouch = null; }
+  }, HOLD_MS);
+}, { passive: true });
+grid.addEventListener('touchmove', e => {
+  const t = e.touches[0];
+  if (drag) { e.preventDefault(); dragMove(t.clientX, t.clientY); return; }
+  // Le doigt bouge avant la fin de l'appui : c'est un défilement, pas un déplacement
+  if (pendingTouch && Math.hypot(t.clientX - pendingTouch.x, t.clientY - pendingTouch.y) > SLOP) {
+    clearTimeout(pendingTouch.timer);
+    pendingTouch = null;
+  }
+}, { passive: false });
+function touchEnd() {
+  if (pendingTouch) { clearTimeout(pendingTouch.timer); pendingTouch = null; }
+  dragEnd();
+}
+grid.addEventListener('touchend', touchEnd);
+grid.addEventListener('touchcancel', touchEnd);
+grid.addEventListener('contextmenu', e => { if (state.reorder) e.preventDefault(); });
+grid.addEventListener('mousedown', e => {
+  if (!state.reorder || e.button !== 0 || pendingTouch || drag) return;
+  const el = cibleDrag(e.target);
+  if (!el) return;
+  e.preventDefault();
+  const sx = e.clientX, sy = e.clientY;
+  const move = ev => {
+    if (!drag && Math.hypot(ev.clientX - sx, ev.clientY - sy) > 4) dragStart(el, sx, sy);
+    if (drag) dragMove(ev.clientX, ev.clientY);
+  };
+  const up = () => {
+    document.removeEventListener('mousemove', move);
+    document.removeEventListener('mouseup', up);
+    dragEnd();
+  };
+  document.addEventListener('mousemove', move);
+  document.addEventListener('mouseup', up);
 });
 
 $('journalList').addEventListener('click', e => {
@@ -1341,6 +1865,12 @@ $('settings').addEventListener('click', e => {
     case 'rev-edit': editRevenu(i); break;
     case 'rev-add':  editRevenu(-1); break;
     case 'cat-edit': editCategorie(i); break;
+    case 'fixe': {
+      const c = getConfig();
+      c.depenses[i].fixe = !isFixe(c.depenses[i]);
+      saveConfig(c);
+      break;
+    }
     case 'cat-add':  editCategorie(-1, getConfig().groupes[i]); break;
     case 'grp-edit': editGroupe(i); break;
     case 'grp-add':  editGroupe(-1); break;
@@ -1427,11 +1957,14 @@ function editCategorie(i, groupeDefaut) {
   const cfg = getConfig();
   const d = i >= 0 ? cfg.depenses[i] : { nom: '', montant: 0, groupe: groupeDefaut || cfg.groupes[0] || '' };
   const options = cfg.groupes.map(g => `<option ${g === d.groupe ? 'selected' : ''}>${esc(g)}</option>`).join('');
+  const fixe = i >= 0 ? isFixe(d) : false;
   openSheet({
     title: i >= 0 ? 'Modifier la catégorie' : 'Nouvelle catégorie',
     fields: field('eNom', 'Nom', d.nom, 'maxlength="60" placeholder="ex : Restaurants"')
           + field('eMont', 'Montant prévu par mois (€)', amountInput(d.montant), 'inputmode="decimal" class="amount" placeholder="0,00"')
-          + `<div class="field"><label for="eGrp">Groupe</label><select id="eGrp">${options}</select></div>`
+          + `<div class="field"><label for="eGrp">Groupe <small style="font-weight:500;color:var(--fg3)">(sert à classer la liste de saisie)</small></label><select id="eGrp">${options}</select></div>`
+          + `<div class="switch-field"><span>Charge fixe<small>Bleu = fixe · violet = variable</small></span>
+               <button type="button" class="sw-wrap${fixe ? ' on' : ''}" id="eFixe" role="switch" aria-checked="${fixe}">${fixe ? 'Fixe' : 'Variable'}<span class="sw"></span></button></div>`
           + (i >= 0 ? '<p class="form-note">Renommer la catégorie met aussi à jour les dépenses déjà saisies. Si vous la supprimez, ses dépenses restent visibles dans « Hors budget ».</p>' : ''),
     onSave() {
       const nom = $('eNom').value.trim(), montant = parseAmount($('eMont').value), groupe = $('eGrp').value;
@@ -1440,11 +1973,9 @@ function editCategorie(i, groupeDefaut) {
       const c = getConfig();
       if (c.depenses.some((x, j) => j !== i && sameName(x.nom, nom))) return 'Une catégorie porte déjà ce nom.';
       const renames = i >= 0 && d.nom !== nom ? [{ from: d.nom, to: nom }] : [];
-      const cat = { nom, montant, groupe };
-      if (i >= 0) {
-        if (c.depenses[i].groupe !== groupe) { c.depenses.splice(i, 1); insertInGroup(c, cat); }
-        else c.depenses[i] = cat;
-      } else insertInGroup(c, cat);
+      const cat = { nom, montant, groupe, fixe: $('eFixe').classList.contains('on') };
+      // L'ordre des widgets est libre : on garde la place actuelle, les nouvelles vont à la fin
+      if (i >= 0) c.depenses[i] = cat; else c.depenses.push(cat);
       saveConfig(c, renames);
       if ($('fCat').value === d.nom && renames.length) $('fCat').value = nom;
       toast(i >= 0 ? 'Catégorie enregistrée' : 'Catégorie ajoutée');
@@ -1457,12 +1988,15 @@ function editCategorie(i, groupeDefaut) {
     } : null,
   });
 }
-// Place une catégorie à la fin de son groupe
-function insertInGroup(c, cat) {
-  let pos = -1;
-  c.depenses.forEach((x, j) => { if (x.groupe === cat.groupe) pos = j; });
-  if (pos < 0) c.depenses.push(cat); else c.depenses.splice(pos + 1, 0, cat);
-}
+// Interrupteur « Charge fixe » dans la fiche catégorie
+$('editFields').addEventListener('click', e => {
+  const b = e.target.closest('#eFixe');
+  if (!b) return;
+  const on = !b.classList.contains('on');
+  b.classList.toggle('on', on);
+  b.setAttribute('aria-checked', String(on));
+  b.firstChild.textContent = on ? 'Fixe' : 'Variable';
+});
 
 function editGroupe(i) {
   const cfg = getConfig();
@@ -1608,6 +2142,7 @@ $('syncLine').addEventListener('click', () => { if (canSync()) sync(); });
 
 $('fDate').value = dateKey(new Date());
 renderWho($('fWho'), state.author);
+setLegend(lsGet('legend', false));
 renderAll();
 
 if (!state.author || (!state.code && !state.localOnly)) showWelcome();

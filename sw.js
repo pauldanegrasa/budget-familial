@@ -3,7 +3,7 @@
 // arrivent dès qu'il y a du réseau), cache en secours si hors ligne.
 // Les appels au Google Apps Script ne passent jamais par le cache.
 
-const CACHE = 'budget-familial-v1';
+const CACHE = 'budget-familial-v2';
 const FICHIERS_APP = [
   './',
   './index.html',

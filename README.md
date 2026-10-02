@@ -12,6 +12,9 @@ et partagée en temps réel grâce à votre Google Sheet.
 
 Comptez environ **30 minutes** pour la mise en place, à faire **une seule fois**.
 
+> 🔄 **Vous avez déjà installé l'app et voulez la mettre à jour ?** Suivez le guide
+> [MISE-A-JOUR.md](MISE-A-JOUR.md).
+
 ---
 
 ## Ce qu'il y a dans ce dossier
@@ -237,10 +240,16 @@ Autres vérifications :
 
 **Onglet Opérations** : `id | date | categorie | libelle | montant | auteur`
 
-**Onglet Config** : `type | nom | montant | groupe | ordre`, où `type` vaut :
+**Onglet Config** : `type | nom | montant | groupe | ordre | fixe`, où `type` vaut :
 - `revenu` — un revenu mensuel,
 - `depense` — une catégorie de dépense (avec son montant prévu et son groupe),
 - `groupe` — un groupe (permet de garder un groupe même quand il est encore vide, et son ordre d'affichage).
+
+`ordre` donne la position des familles et des catégories dans l'onglet 📊 Budget (bouton **Réorganiser**).
+`fixe` vaut `OUI` (charge fixe, ligne bleue) ou `NON` (charge variable, ligne rose).
+
+Les dépenses créées par la coche « payé en une fois » ont un identifiant qui commence par `auto-`
+et le libellé « Paiement mensuel » : décocher ne supprime que celles-là.
 
 Si Paul et Laurie modifient les **Paramètres** exactement en même temps, c'est la dernière
 modification enregistrée qui l'emporte. Les **dépenses**, elles, ne se marchent jamais dessus.
